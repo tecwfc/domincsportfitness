@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dominc Admin | Gestão Premium</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --primary: #8e5fb1;
+        --primary-dark: #6a3d8b;
+        --accent: #d4a5ff;
+        --bg: #0b0612;
+        --glass: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --text: #ffffff;
+        --gray: #94a3b8;
+        --error: #ff4d4d;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: var(--bg);
+        background-image: radial-gradient(circle at 10% 20%, rgba(142, 95, 177, 0.15), transparent 40%),
+          radial-gradient(circle at 90% 80%, rgba(212, 165, 255, 0.1), transparent 40%);
+        color: var(--text);
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow-x: hidden;
+      }
+
+      /* NOVO LOGIN OVERLAY PREMIUM */
+      #login-overlay {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        transition: transform 0.8s cubic-bezier(0.87, 0, 0.13, 1), opacity 0.5s;
+      }
+
+      .login-box {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(40px);
+        border: 1px solid var(--glass-border);
+        padding: 50px 40px;
+        border-radius: 40px;
+        text-align: center;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        animation: fadeInScale 0.6s ease-out;
+      }
+
+      @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+      }
+
+      .logo-wrapper {
+        position: relative;
+        width: 130px;
+        height: 130px;
+        margin: 0 auto 40px;
+      }
+
+      .logo-container {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 30px rgba(142, 95, 177, 0.3);
+      }
+
+      /* Efeito de brilho girando atrás do logo */
+      .logo-wrapper::after {
+        content: '';
+        position: absolute;
+        inset: -5px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, transparent, var(--primary), transparent);
+        animation: rotate 3s linear infinite;
+        z-index: 1;
+      }
+
+      @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      .logo-container img { width: 65%; height: auto; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
+
+      .login-box h2 {
+        font-weight: 800;
+        letter-spacing: 5px;
+        margin-bottom: 5px;
+        background: linear-gradient(to right, #fff, var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .shake { animation: shake 0.4s ease-in-out; }
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+      }
+
+      /* ADMIN CONTENT ESTILOS */
+      #admin-content {
+        display: none;
+        width: 95%;
+        max-width: 700px;
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        padding: 45px;
+        border-radius: 40px;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+        margin: 20px 0;
+      }
+
+      .input-wrapper i {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary);
+        opacity: 0.8;
+      }
+
+      input, select {
+        width: 100%;
+        padding: 16px 20px 16px 48px;
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-family: inherit;
+        box-sizing: border-box;
+        transition: 0.3s;
+      }
+
+      input:focus, select:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--primary);
+        box-shadow: 0 0 20px rgba(142, 95, 177, 0.2);
+      }
+
+      .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+      .btn-save {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        padding: 20px;
+        width: 100%;
+        border-radius: 20px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: 0.4s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-save::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%; width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: 0.5s;
+      }
+
+      .btn-save:hover::before { left: 100%; }
+      .btn-save:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(142, 95, 177, 0.4); }
+
+      .form-header { text-align: center; margin-bottom: 40px; }
+      .form-header i { font-size: 2.8rem; color: var(--accent); text-shadow: 0 0 20px rgba(212, 165, 255, 0.5); }
+      label { display: block; font-weight: 700; margin-bottom: 10px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); }
+      .form-group { margin-bottom: 25px; }
+
+      .upload-area {
+        border: 2px dashed var(--glass-border);
+        padding: 30px;
+        border-radius: 25px;
+        text-align: center;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.01);
+        transition: 0.3s;
+      }
+      .upload-area:hover { background: rgba(255, 255, 255, 0.03); border-color: var(--primary); }
+
+      #status-msg {
+        text-align: center; margin-top: 20px; padding: 15px; border-radius: 15px; display: none; border: 1px solid transparent;
+      }
+
+      @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } .login-box { padding: 40px 25px; } }
+    </style>
+  </head>
+  <body>
+    <div id="login-overlay">
+      <div class="login-box" id="loginCard">
+        <div class="logo-wrapper">
+            <div class="logo-container">
+                <img src="assets/logo_dominc.png" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8018/8018979.png'" />
+            </div>
+        </div>
+        <h2>DOMINC</h2>
+        <p style="color: var(--gray); font-size: 0.75rem; margin-bottom: 35px; letter-spacing: 3px; font-weight: 600;">PORTAL ADMINISTRATIVO</p>
+        
+        <div class="input-wrapper" style="margin-bottom: 25px">
+          <i class="fas fa-shield-halved"></i>
+          <input type="password" id="admin-pass" placeholder="SENHA DE ACESSO" style="padding-left: 48px; text-align: center; letter-spacing: 5px" onkeypress="handleEnter(event)" />
+        </div>
+        
+        <button class="btn-save" onclick="checkPass()">
+            <i class="fas fa-unlock-alt" style="margin-right: 10px;"></i> ENTRAR NO PAINEL
+        </button>
+      </div>
+    </div>
+
+    <div id="admin-content">
+      <div class="form-header">
+        <i class="fas fa-gem"></i>
+        <h2 style="letter-spacing: 2px; margin-top: 10px">Cadastro de Produtos</h2>
+      </div>
+
+      <form id="productForm">
+        <div class="form-group">
+          <label>Nome do Produto</label>
+          <div class="input-wrapper">
+            <i class="fas fa-tag"></i>
+            <input type="text" id="nome" required placeholder="Ex: Garrafa Térmica Diamond Purple" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Capacidade / Descrição</label>
+            <div class="input-wrapper"><i class="fas fa-info-circle"></i><input type="text" id="ml" placeholder="Ex: 750ml" /></div>
+          </div>
+          <div class="form-group">
+            <label>Grade de Tamanhos</label>
+            <div class="input-wrapper"><i class="fas fa-ruler-combined"></i><input type="text" id="tamanho" placeholder="Ex: P, M, G" /></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Preço (R$)</label>
+            <div class="input-wrapper"><i class="fas fa-dollar-sign"></i><input type="number" step="0.01" id="preco" required /></div>
+          </div>
+          <div class="form-group">
+            <label>Estoque</label>
+            <div class="input-wrapper"><i class="fas fa-boxes-stacked"></i><input type="number" id="estoque" required /></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Categoria</label>
+          <div class="input-wrapper">
+            <i class="fas fa-list-ul"></i>
+            <select id="categoria" onchange="toggleGrade()">
+              <option value="Garrafas">Garrafas Térmicas</option>
+              <option value="Roupas">Roupas Fitness</option>
+              <option value="Acessórios">Acessórios</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+          <i class="fas fa-cloud-arrow-up" style="font-size: 2rem; color: var(--accent); margin-bottom: 15px"></i>
+          <p id="file-name" style="margin: 0; font-weight: 600">IMAGEM DO PRODUTO (Upload)</p>
+          <input type="file" id="fileInput" accept="image/*" style="display: none" />
+        </div>
+
+        <div class="form-group" style="margin-top:20px">
+          <label>Ou Link da Imagem</label>
+          <div class="input-wrapper"><i class="fas fa-link"></i><input type="url" id="imagemLink" /></div>
+        </div>
+
+        <div class="form-group">
+          <label>Selo de Exclusividade</label>
+          <div class="input-wrapper">
+            <i class="fas fa-certificate"></i>
+            <select id="destaque">
+              <option value="não">Nenhum Selo</option>
+              <option value="sim">Destaque VIP</option>
+              <option value="lançamento">Novo Lançamento</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-save" id="submitBtn">
+          <i class="fas fa-paper-plane" style="margin-right: 10px"></i> FINALIZAR E PUBLICAR
+        </button>
+      </form>
+      <div id="status-msg"></div>
+    </div>
+
+    <script>
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzquHmw7ghIShf0Iuad5jU_vU4ZL-EuPik7njFEymXkL04nDdxVyoNYiJtTrC5BfPcw/exec";
+      const SENHA_MESTRA = "1234";
+
+      // LOGIN FUNCTIONS
+      function handleEnter(e) {
+          if (e.key === "Enter") checkPass();
+      }
+
+      function checkPass() {
+        const pass = document.getElementById("admin-pass").value;
+        const loginCard = document.getElementById("loginCard");
+        
+        if (pass === SENHA_MESTRA) {
+          document.getElementById("login-overlay").style.opacity = "0";
+          setTimeout(() => {
+            document.getElementById("login-overlay").style.display = "none";
+            document.getElementById("admin-content").style.display = "block";
+          }, 500);
+        } else {
+          loginCard.classList.add("shake");
+          document.getElementById("admin-pass").value = "";
+          document.getElementById("admin-pass").style.borderColor = "var(--error)";
+          setTimeout(() => loginCard.classList.remove("shake"), 400);
+        }
+      }
+
+      // PRODUCT FUNCTIONS
+      function limparParaBusca(texto) {
+        return texto.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+      }
+
+      function toggleGrade() {
+        const cat = document.getElementById("categoria").value;
+        document.getElementById("tamanho").style.opacity = (cat !== "Roupas") ? "0.5" : "1";
+      }
+
+      document.getElementById("fileInput").addEventListener("change", function (e) {
+        document.getElementById("file-name").innerText = "Selecionado: " + e.target.files[0]?.name;
+      });
+
+      const processImg = (file) => new Promise((res) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const scale = 800 / img.width;
+            canvas.width = 800; canvas.height = img.height * scale;
+            canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+            res(canvas.toDataURL("image/jpeg", 0.8));
+          };
+        };
+      });
+
+      document.getElementById("productForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const btn = document.getElementById("submitBtn");
+        const msg = document.getElementById("status-msg");
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PUBLICANDO...';
+
+        let finalImg = document.getElementById("imagemLink").value;
+        if (document.getElementById("fileInput").files.length > 0) {
+          finalImg = await processImg(document.getElementById("fileInput").files[0]);
+        }
+
+        const payload = {
+          nome: document.getElementById("nome").value,
+          ml: document.getElementById("ml").value,
+          preco: document.getElementById("preco").value,
+          categoria: document.getElementById("categoria").value,
+          tamanho: document.getElementById("tamanho").value,
+          arquivoLocal: finalImg,
+          destaque: document.getElementById("destaque").value,
+          estoque: document.getElementById("estoque").value,
+          busca: limparParaBusca(document.getElementById("nome").value + " " + document.getElementById("categoria").value)
+        };
+
+        fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) })
+        .then(() => {
+          msg.style.display = "block";
+          msg.style.background = "rgba(74, 222, 128, 0.1)";
+          msg.style.borderColor = "#4ade80";
+          msg.style.color = "#4ade80";
+          msg.innerHTML = "✨ PRODUTO CADASTRADO COM SUCESSO!";
+          document.getElementById("productForm").reset();
+        })
+        .catch(() => {
+          msg.style.display = "block";
+          msg.style.color = "#f87171";
+          msg.innerText = "❌ Erro na conexão.";
+        })
+        .finally(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right: 10px;"></i> FINALIZAR E PUBLICAR';
+        });
+      });
+
+      toggleGrade();
+    </script>
+  </body>
+</html>

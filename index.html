@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dominc | Sport Fitness</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="assets/logo_dominc.png" alt="Logo Dominc">
+            <h1>Dominc<span>Sport Fitness</span></h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Início</a></li>
+                <li><a href="#produtos">Produtos</a></li>
+                <li><button id="cart-btn" class="nav-cart">
+                    <i class="fas fa-shopping-bag"></i> 
+                    <span id="cart-count">0</span>
+                </button></li>
+            </ul>
+        </nav>
+    </header>
+<section class="hero-slim">
+    <div class="hero-slim-container">
+        <div class="slim-video-box">
+            <video autoplay muted loop playsinline>
+                <source src="assets/video.mp4" type="video/mp4">
+            </video>
+            <div class="slim-badge">24h Gelado</div>
+        </div>
+           
+<div class="slim-content swiper slimSwiper">
+    <div class="swiper-wrapper">
+        
+        <div class="swiper-slide">
+            <div class="slide-inner-content">
+                <div class="text-inner">
+                    <span class="mini-tag">Performance Dominc</span>
+                    <h2>Estilo que acompanha seu ritmo.</h2>
+                    <p>Tecnologia térmica premium com isolamento a vácuo.</p>
+                </div>
+                <a href="#produtos" class="btn-slim">Comprar Agora</a>
+            </div>
+        </div>
+
+        <div class="swiper-slide">
+            <div class="slide-inner-content">
+                <div class="text-inner">
+                    <span class="mini-tag">Novidade</span>
+                    <h2>Garrafas Coleção Neon</h2>
+                    <p>Cores vibrantes para destacar seu treino.</p>
+                </div>
+                <a href="#produtos" class="btn-slim">Ver Coleção</a>
+            </div>
+        </div>
+
+        <div class="swiper-slide">
+            <div class="slide-inner-content">
+                <div class="text-inner">
+                    <span class="mini-tag">Oferta Especial</span>
+                    <h2>Frete Grátis na Primeira Compra</h2>
+                    <p>Válido para toda a linha Sport Fitness.</p>
+                </div>
+                <a href="#produtos" class="btn-slim">Aproveitar</a>
+            </div>
+        </div>
+
+    </div>
+    <div class="swiper-pagination slim-pagination"></div>
+</div>
+</section>
+<div class="search-container">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-input" placeholder="O que você está procurando hoje?">
+    </div>
+</div>
+    <section id="produtos" class="produtos-section">
+        <div class="section-title">
+            <h2>Coleções Premium</h2>
+    <div class="filtros-modernos">
+    <button class="filtro-btn active" data-categoria="todos">
+        <div class="icon-box"><i class="fas fa-border-all"></i></div>
+        <span>Todas</span>
+    </button>
+    <button class="filtro-btn" data-categoria="termica">
+        <div class="icon-box"><i class="fas fa-bottle-water"></i></div>
+        <span>Garrafas</span>
+    </button>
+    <button class="filtro-btn" data-categoria="roupas">
+        <div class="icon-box"><i class="fas fa-tshirt"></i></div>
+        <span>Roupas</span>
+    </button>
+    <button class="filtro-btn" data-categoria="acessorios">
+        <div class="icon-box"><i class="fas fa-dumbbell"></i></div>
+        <span>Acessórios</span>
+    </button>
+
+</div>
+            <div class="produtos-container" id="produtos-container">
+            </div>
+    </section>
+
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-content">
+           <div class="cart-header">
+    <h2>Seu Carrinho</h2>
+    <button id="clear-cart-btn" class="btn-clear-all">
+        <i class="fa-solid fa-trash-can"></i> Limpar Tudo
+    </button>
+    <button id="close-modal-btn">&times;</button>
+</div>
+            <div class="cart-items" id="cart-items">
+                </div>
+            <div class="cart-footer">
+                <div class="resumo">
+                    <p>Subtotal: <span id="subtotal">R$ 0,00</span></p>
+                    <p class="total">Total: <span id="cart-total">R$ 0,00</span></p>
+                </div>
+                <input type="text" placeholder="Endereço completo para entrega..." id="address" class="address-input">
+                <button class="btn-checkout" id="checkout-btn">Finalizar Pedido via WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-column">
+            <div class="logo-footer">
+                <h2>Dominc<span>Sport Fitness</span></h2>
+            </div>
+            <p class="footer-description">
+                Elevando sua experiência de hidratação com tecnologia de isolamento térmico premium e design minimalista. 
+            </p>
+            <div class="social-links">
+                <a href="https://instagram.com/seu-perfil" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://facebook.com/seu-perfil" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="https://wa.me/5588999049636" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-column">
+            <h3>Navegação</h3>
+            <ul>
+                <li><a href="#">Início</a></li>
+                <li><a href="#produtos">Coleções</a></li>
+                <li><a href="#">Sobre Nós</a></li>
+                <li><a href="#">Trocas e Devoluções</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3>Contato</h3>
+            <ul class="contact-info">
+                <li><i class="fa-solid fa-location-dot"></i> Juazeiro do Norte, CE</li>
+                <li><i class="fa-solid fa-phone"></i> (88) 99904-9636</li>
+                <li><i class="fa-solid fa-envelope"></i> contato@DomincsportFitness.com</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2025 DomincsportFitness. Todos os direitos reservados.</p>
+        <div class="payment-methods">
+            <i class="fa-brands fa-pix"></i>
+            <i class="fa-brands fa-cc-visa"></i>
+            <i class="fa-brands fa-cc-mastercard"></i>
+        </div>
+    </div>
+</footer>
+
+<a href="https://wa.me/5588999049636?text=Olá! Gostaria de saber mais sobre os produtos da Dominc Sport Fitness." 
+   class="whatsapp-float" 
+   target="_blank" 
+   rel="noopener noreferrer">
+    <i class="fa-brands fa-whatsapp"></i>
+    <span class="tooltip-whatsapp">Fale Conosco</span>
+</a>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="script.js"></script>
+
+    <div id="size-modal" class="size-modal">
+    <div class="size-content">
+        <h3 id="modal-step-title">Selecione a Cor</h3>
+        <p id="size-product-name" style="color: var(--text-muted); font-size: 0.9rem;"></p>
+        
+        <div id="color-step" class="color-selection">
+    <button class="color-dot black" onclick="selectColor('Preto')" title="Preto"></button>
+    <button class="color-dot purple" onclick="selectColor('Roxo')" title="Roxo"></button>
+    <button class="color-dot gray" onclick="selectColor('Cinza')" title="Cinza"></button>
+    <button class="color-dot blue" onclick="selectColor('Azul')" title="Azul"></button>
+</div>
+
+        <div id="size-step" class="selection-grid" style="display: none;">
+            <button onclick="finishSelection('PP')">PP</button>
+            <button onclick="finishSelection('P')">P</button>
+            <button onclick="finishSelection('M')">M</button>
+            <button onclick="finishSelection('G')">G</button>
+            <button onclick="finishSelection('GG')">GG</button>
+            <button onclick="finishSelection('XG')">XG</button>
+        </div>
+
+        <button class="btn-cancel" onclick="closeSizeModal()">Cancelar</button>
+    </div>
+</div>
+
+</body>
+</html>
