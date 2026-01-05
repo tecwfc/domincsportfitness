@@ -1,219 +1,283 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dominc | Sport Fitness</title>
-    
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8e5fb1',
+                        accent: '#d4af37',
+                        bgSoft: '#f4effa',
+                        textDark: '#2d1b3d',
+                        textMuted: '#7d6a8e'
+                    }
+                }
+            }
+        }
+    </script>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+        }
+
+
+        @keyframes slideLeft {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .animate-slide-left {
+            animation: slideLeft 0.4s ease-out;
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <div class="logo">
-            <img src="assets/logo_dominc.png" alt="Logo Dominc">
-            <h1>Dominc<span>Sport Fitness</span></h1>
+
+<body class="bg-white text-textDark">
+
+    <header class="glass fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center border-b border-black/5">
+        <div class="flex items-center gap-4 group cursor-pointer">
+            <div class="relative">
+                <div
+                    class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
+                </div>
+                <img src="assets/logo_dominc.png" alt="Logo Dominc"
+                    class="relative h-14 w-14 object-cover rounded-full border-2 border-white shadow-xl transform transition duration-500 group-hover:scale-110 group-hover:rotate-3">
+            </div>
+
+            <div class="flex flex-col flex-start leading-tight">
+                <h1
+                    class="font-black text-2xl text-primary tracking-tighter transition-colors duration-300 group-hover:text-accent">
+                    Dominc
+                </h1>
+                <span
+                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-accent opacity-80 group-hover:opacity-100">
+                    Sport Fitness
+                </span>
+            </div>
         </div>
-        <nav>
-            <ul>
-                <li><a href="#">Início</a></li>
-                <li><a href="#produtos">Produtos</a></li>
-                <li><button id="cart-btn" class="nav-cart">
-                    <i class="fas fa-shopping-bag"></i> 
-                    <span id="cart-count">0</span>
-                </button></li>
-            </ul>
+        <ul class="flex items-center gap-6">
+            <li class="hidden md:block"><a href="#" class="font-semibold hover:text-primary transition">Início</a>
+            </li>
+            <li class="hidden md:block"><a href="#produtos"
+                    class="font-semibold hover:text-primary transition">Produtos</a></li>
+            <li>
+                <button id="cart-btn"
+                    class="relative bg-primary text-white p-2.5 rounded-full hover:bg-accent transition shadow-lg">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span id="cart-count"
+                        class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">0</span>
+                </button>
+            </li>
+        </ul>
         </nav>
     </header>
-<section class="hero-slim">
-    <div class="hero-slim-container">
-        <div class="slim-video-box">
-            <video autoplay muted loop playsinline>
-                <source src="assets\video.mp4" type="video/mp4">
-            </video>
-            <div class="slim-badge">24h Gelado</div>
-        </div>
-           
-<div class="slim-content swiper slimSwiper">
-    <div class="swiper-wrapper">
+
+   <section class="mt-24 px-4 max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row bg-slate-50 rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm">
         
-        <div class="swiper-slide">
-            <div class="slide-inner-content">
-                <div class="text-inner">
-                    <span class="mini-tag">Performance Dominc</span>
-                    <h2>Estilo que acompanha seu ritmo.</h2>
-                    <p>Tecnologia térmica premium com isolamento a vácuo.</p>
-                </div>
-                <a href="#produtos" class="btn-slim">Comprar Agora</a>
-            </div>
+        <div class="relative w-full md:w-2/5 h-56 md:h-auto overflow-hidden">
+            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                <source src="assets/video.mp4" type="video/mp4">
+            </video>
+            <div class="absolute top-4 left-4 bg-accent text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg">24H GELADO</div>
         </div>
-
-        <div class="swiper-slide">
-            <div class="slide-inner-content">
-                <div class="text-inner">
-                    <span class="mini-tag">Novidade</span>
-                    <h2>Garrafas Coleção Neon</h2>
-                    <p>Cores vibrantes para destacar seu treino.</p>
+        
+        <div class="relative flex-1 p-8 md:p-12 swiper slimSwiper min-h-[300px] md:min-h-auto flex items-center">
+            <div class="swiper-wrapper">
+                
+                <div class="swiper-slide flex flex-col justify-center h-full pb-8 md:pb-0">
+                    <span class="text-[10px] font-bold text-accent uppercase tracking-[0.2em] mb-2 block">Performance Dominc</span>
+                    <h2 class="text-2xl md:text-4xl font-black text-primary leading-[1.1] mb-4">Estilo que acompanha seu ritmo.</h2>
+                    <p class="text-sm text-textMuted mb-8 max-w-md">Tecnologia térmica premium com isolamento a vácuo para manter sua hidratação perfeita.</p>
+                    <a href="#produtos" class="inline-block bg-primary text-white px-10 py-4 rounded-full font-bold text-sm w-fit hover:bg-accent transition-all shadow-xl shadow-primary/20">Comprar Agora</a>
                 </div>
-                <a href="#produtos" class="btn-slim">Ver Coleção</a>
-            </div>
-        </div>
 
-        <div class="swiper-slide">
-            <div class="slide-inner-content">
-                <div class="text-inner">
-                    <span class="mini-tag">Oferta Especial</span>
-                    <h2>Frete Grátis na Primeira Compra</h2>
-                    <p>Válido para toda a linha Sport Fitness.</p>
+                <div class="swiper-slide flex flex-col justify-center h-full pb-8 md:pb-0">
+                    <span class="text-[10px] font-bold text-accent uppercase tracking-[0.2em] mb-2 block">Coleção 2026</span>
+                    <h2 class="text-2xl md:text-4xl font-black text-primary leading-[1.1] mb-4">Destaque-se em cada treino.</h2>
+                    <p class="text-sm text-textMuted mb-8 max-w-md">Conheça as novas cores Neon que acabaram de chegar em nosso estoque.</p>
+                    <a href="#produtos" class="inline-block bg-primary text-white px-10 py-4 rounded-full font-bold text-sm w-fit hover:bg-accent transition-all shadow-xl shadow-primary/20">Ver Novidades</a>
                 </div>
-                <a href="#produtos" class="btn-slim">Aproveitar</a>
-            </div>
-        </div>
 
+            </div>
+
+            <div class="swiper-button-next !hidden md:!flex !text-primary !after:text-lg"></div>
+            <div class="swiper-button-prev !hidden md:!flex !text-primary !after:text-lg"></div>
+            
+            <div class="swiper-pagination !bottom-4 md:!bottom-8"></div>
+        </div>
     </div>
-    <div class="swiper-pagination slim-pagination"></div>
-</div>
 </section>
-<div class="search-container">
-    <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input type="text" id="search-input" placeholder="O que você está procurando hoje?">
+
+    <div class="px-4 mt-12 mb-8">
+        <div
+            class="max-w-xl mx-auto flex items-center bg-slate-50 border border-slate-200 px-6 py-4 rounded-full focus-within:ring-2 ring-primary/20 transition-all">
+            <i class="fas fa-search text-textMuted mr-4"></i>
+            <input type="text" id="search-input" placeholder="O que você está procurando hoje?"
+                class="bg-transparent border-none outline-none w-full text-sm font-medium">
+        </div>
     </div>
-</div>
-    <section id="produtos" class="produtos-section">
-        <div class="section-title">
-            <h2>Coleções Premium</h2>
-    <div class="filtros-modernos">
-    <button class="filtro-btn active" data-categoria="todos">
-        <div class="icon-box"><i class="fas fa-border-all"></i></div>
-        <span>Todas</span>
-    </button>
-    <button class="filtro-btn" data-categoria="termica">
-        <div class="icon-box"><i class="fas fa-bottle-water"></i></div>
-        <span>Garrafas</span>
-    </button>
-    <button class="filtro-btn" data-categoria="roupas">
-        <div class="icon-box"><i class="fas fa-tshirt"></i></div>
-        <span>Roupas</span>
-    </button>
-    <button class="filtro-btn" data-categoria="acessorios">
-        <div class="icon-box"><i class="fas fa-dumbbell"></i></div>
-        <span>Acessórios</span>
-    </button>
 
-</div>
-            <div class="produtos-container" id="produtos-container">
-            </div>
-    </section>
+    <section id="produtos" class="px-4 max-w-7xl mx-auto pb-20">
+    <div class="text-center mb-10">
+        <h2 class="text-3xl font-black mb-8 tracking-tight">Coleções Premium</h2>
 
-    <div class="cart-modal" id="cart-modal">
-        <div class="cart-content">
-           <div class="cart-header">
-    <h2>Seu Carrinho</h2>
-    <button id="clear-cart-btn" class="btn-clear-all">
-        <i class="fa-solid fa-trash-can"></i> Limpar Tudo
-    </button>
-    <button id="close-modal-btn">&times;</button>
-</div>
-            <div class="cart-items" id="cart-items">
+        <div class="flex justify-start md:justify-center gap-4 overflow-x-auto pb-4 no-scrollbar">
+            
+            <button class="filtro-btn active group flex flex-col items-center min-w-[80px]" data-categoria="todos">
+                <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white group-[.active]:shadow-lg transition">
+                    <i class="fas fa-border-all text-xl"></i>
                 </div>
-            <div class="cart-footer">
-                <div class="resumo">
-                    <p>Subtotal: <span id="subtotal">R$ 0,00</span></p>
-                    <p class="total">Total: <span id="cart-total">R$ 0,00</span></p>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Todas</span>
+            </button>
+
+            <button class="filtro-btn group flex flex-col items-center min-w-[80px]" data-categoria="garrafas">
+                <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white transition">
+                    <i class="fas fa-bottle-water text-xl"></i>
                 </div>
-                <input type="text" placeholder="Endereço completo para entrega..." id="address" class="address-input">
-                <button class="btn-checkout" id="checkout-btn">Finalizar Pedido via WhatsApp</button>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Garrafas</span>
+            </button>
+
+            <button class="filtro-btn group flex flex-col items-center min-w-[80px]" data-categoria="roupas">
+                <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white transition">
+                    <i class="fas fa-tshirt text-xl"></i>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Roupas</span>
+            </button>
+
+            <button class="filtro-btn group flex flex-col items-center min-w-[80px]" data-categoria="acessorios">
+                <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white transition">
+                    <i class="fas fa-dumbbell text-xl"></i> </div>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Acessórios</span>
+            </button>
+            
+        </div>
+    </div>
+
+    <div id="produtos-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        </div>
+</section>
+    <footer class="bg-slate-900 text-white pt-20 pb-10 px-6 mt-20">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div>
+                <h2 class="text-2xl font-black mb-6 italic uppercase tracking-tighter">Dominc<span
+                        class="text-accent font-light">Sport</span></h2>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">Tecnologia de isolamento térmico premium e design
+                    minimalista para sua melhor performance.</p>
+                <div class="flex gap-4">
+                    <a href="#"
+                        class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-accent transition"><i
+                            class="fa-brands fa-instagram"></i></a>
+                    <a href="#"
+                        class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-accent transition"><i
+                            class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-bold mb-6 text-accent">Contato</h3>
+                <ul class="text-slate-400 text-sm space-y-4">
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-location-dot"></i> Juazeiro do Norte, CE
+                    </li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-phone"></i> (88) 99904-9636</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-bold mb-6 text-accent">Pagamento</h3>
+                <div class="flex gap-4 text-3xl text-slate-500">
+                    <i class="fa-brands fa-pix"></i>
+                    <i class="fa-brands fa-cc-visa"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="cart-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-end">
+        <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl animate-slide-left">
+            <div class="p-6 border-b flex justify-between items-center bg-slate-50">
+                <h2 class="text-lg font-black uppercase">Sua Sacola</h2>
+                <div class="flex gap-3">
+                    <button id="clear-cart-btn"
+                        class="text-red-500 text-xs font-bold uppercase tracking-tighter">Limpar</button>
+                    <button id="close-modal-btn" class="text-2xl">&times;</button>
+                </div>
+            </div>
+            <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-6"></div>
+            <div class="p-6 border-t bg-slate-50">
+                <div class="flex justify-between font-black text-xl mb-6">
+                    <span>TOTAL</span>
+                    <span id="cart-total" class="text-primary">R$ 0,00</span>
+                </div>
+                <input type="text" id="address" placeholder="Endereço para entrega..."
+                    class="w-full p-4 rounded-xl border mb-4 text-sm font-medium focus:ring-2 ring-primary/20 outline-none transition">
+                <button id="checkout-btn"
+                    class="w-full bg-primary text-white py-5 rounded-xl font-bold uppercase tracking-widest hover:bg-accent transition shadow-lg">Finalizar
+                    no WhatsApp</button>
             </div>
         </div>
     </div>
 
+    <div id="size-modal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl text-center">
+            <h3 id="modal-step-title" class="text-xl font-black mb-1">Selecione a Cor</h3>
+            <p id="size-product-name" class="text-xs text-textMuted mb-8"></p>
 
-<footer class="footer">
-    <div class="footer-container">
-        <div class="footer-column">
-            <div class="logo-footer">
-                <h2>Dominc<span>Sport Fitness</span></h2>
+            <div id="color-step" class="flex justify-center gap-4 mb-8">
+                <button onclick="selectColor('Preto')"
+                    class="w-10 h-10 rounded-full bg-black ring-offset-2 hover:ring-2 ring-black transition"></button>
+                <button onclick="selectColor('Roxo')"
+                    class="w-10 h-10 rounded-full bg-purple-600 ring-offset-2 hover:ring-2 ring-purple-600 transition"></button>
             </div>
-            <p class="footer-description">
-                Elevando sua experiência de hidratação com tecnologia de isolamento térmico premium e design minimalista. 
-            </p>
-            <div class="social-links">
-                <a href="https://instagram.com/seu-perfil" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                <a href="https://facebook.com/seu-perfil" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                <a href="https://wa.me/5588999049636" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+
+            <div id="size-step" class="grid grid-cols-3 gap-3 hidden mb-8">
+                <button onclick="finishSelection('P')"
+                    class="py-3 border rounded-xl font-bold hover:bg-primary hover:text-white transition">P</button>
+                <button onclick="finishSelection('M')"
+                    class="py-3 border rounded-xl font-bold hover:bg-primary hover:text-white transition">M</button>
+                <button onclick="finishSelection('G')"
+                    class="py-3 border rounded-xl font-bold hover:bg-primary hover:text-white transition">G</button>
             </div>
-        </div>
 
-        <div class="footer-column">
-            <h3>Navegação</h3>
-            <ul>
-                <li><a href="#">Início</a></li>
-                <li><a href="#produtos">Coleções</a></li>
-                <li><a href="#">Sobre Nós</a></li>
-                <li><a href="#">Trocas e Devoluções</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-column">
-            <h3>Contato</h3>
-            <ul class="contact-info">
-                <li><i class="fa-solid fa-location-dot"></i> Juazeiro do Norte, CE</li>
-                <li><i class="fa-solid fa-phone"></i> (88) 99904-9636</li>
-                <li><i class="fa-solid fa-envelope"></i> contato@DomincsportFitness.com</li>
-            </ul>
+            <button onclick="closeSizeModal()" class="text-red-500 font-bold text-sm hover:underline">Cancelar</button>
         </div>
     </div>
 
-    <div class="footer-bottom">
-        <p>&copy; 2025 DomincsportFitness. Todos os direitos reservados.</p>
-        <div class="payment-methods">
-            <i class="fa-brands fa-pix"></i>
-            <i class="fa-brands fa-cc-visa"></i>
-            <i class="fa-brands fa-cc-mastercard"></i>
-        </div>
-    </div>
-</footer>
-
-<a href="https://wa.me/5588999049636?text=Olá! Gostaria de saber mais sobre os produtos da Dominc Sport Fitness." 
-   class="whatsapp-float" 
-   target="_blank" 
-   rel="noopener noreferrer">
-    <i class="fa-brands fa-whatsapp"></i>
-    <span class="tooltip-whatsapp">Fale Conosco</span>
-</a>
+    <a href="https://wa.me/5588999049636" target="_blank"
+        class="fixed bottom-6 right-6 bg-[#25d366] text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-xl hover:scale-110 transition-all z-40">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
 
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="script.js"></script>
-
-    <div id="size-modal" class="size-modal">
-    <div class="size-content">
-        <h3 id="modal-step-title">Selecione a Cor</h3>
-        <p id="size-product-name" style="color: var(--text-muted); font-size: 0.9rem;"></p>
-        
-        <div id="color-step" class="color-selection">
-    <button class="color-dot black" onclick="selectColor('Preto')" title="Preto"></button>
-    <button class="color-dot purple" onclick="selectColor('Roxo')" title="Roxo"></button>
-    <button class="color-dot gray" onclick="selectColor('Cinza')" title="Cinza"></button>
-    <button class="color-dot blue" onclick="selectColor('Azul')" title="Azul"></button>
-</div>
-
-        <div id="size-step" class="selection-grid" style="display: none;">
-            <button onclick="finishSelection('PP')">PP</button>
-            <button onclick="finishSelection('P')">P</button>
-            <button onclick="finishSelection('M')">M</button>
-            <button onclick="finishSelection('G')">G</button>
-            <button onclick="finishSelection('GG')">GG</button>
-            <button onclick="finishSelection('XG')">XG</button>
-        </div>
-
-        <button class="btn-cancel" onclick="closeSizeModal()">Cancelar</button>
-    </div>
-</div>
-
 </body>
+
 </html>
