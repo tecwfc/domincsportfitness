@@ -57,6 +57,26 @@
         .animate-slide-left {
             animation: slideLeft 0.4s ease-out;
         }
+
+        
+    /* Força o slide a respeitar a largura do container pai */
+    .swiper {
+        width: 100%;
+        height: 100%;
+    }
+
+    .swiper-slide {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: auto !important; /* Ajusta a altura conforme o conteúdo */
+    }
+
+    /* Ajuste para que as bolinhas da paginação não sumam no mobile */
+    .swiper-pagination-bullet-active {
+        background: #8e5fb1 !important; /* Cor da sua marca */
+    }
+
     </style>
 </head>
 
@@ -110,7 +130,7 @@
             <div class="absolute top-4 left-4 bg-accent text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg">24H GELADO</div>
         </div>
         
-        <div class="relative flex-1 p-8 md:p-12 swiper slimSwiper min-h-[300px] md:min-h-auto flex items-center">
+        <div class="relative flex-1 p-8 md:p-12 swiper slimSwiper w-full min-h-[350px] md:min-h-auto flex items-center">
             <div class="swiper-wrapper">
                 
                 <div class="swiper-slide flex flex-col justify-center h-full pb-8 md:pb-0">
