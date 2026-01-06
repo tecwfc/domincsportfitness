@@ -246,19 +246,31 @@ window.onload = () => {
     loadProducts();
     updateCart();
 
-    // Inicialização do Slide de Texto
+    // Inicialização corrigida para Mobile
     new Swiper(".slimSwiper", {
-        loop: true,               // Faz o slide voltar ao início
-        spaceBetween: 30,         // Espaço entre as frases
-        effect: "fade",           // Efeito suave de transição (opcional, pode tirar se preferir deslizando)
-        fadeEffect: { crossFade: true },
+        loop: true,
+        spaceBetween: 30,
+        // Removi o 'fade' temporariamente para testar o deslize, 
+        // mas se quiser manter, o segredo é o autoHeight:
+        autoHeight: true, 
+        
+        // Garante que o swiper se ajuste ao abrir no celular
+        observer: true,
+        observeParents: true,
+        watchOverflow: true,
+
         autoplay: {
-            delay: 4000,          // Passa a cada 4 segundos
-            disableOnInteraction: false, // Continua passando mesmo se o usuário clicar
+            delay: 4000,
+            disableOnInteraction: false,
         },
         pagination: {
             el: ".swiper-pagination",
-            clickable: true,      // Permite clicar nos pontinhos
+            clickable: true,
+        },
+        // Adicionando navegação caso queira usar as setas
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
         },
     });
 };
