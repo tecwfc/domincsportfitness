@@ -1,7 +1,7 @@
 // CONFIGURAÇÕES GERAIS
 // const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS81c2V8WFE0NbViXmuT-5k2kv78BUDgIT_nY7wDjOVYN078GJmpBlo_3SUrntbu0g72I0AV37-NnYF/pub?output=csv";
 
-const VIDEO_ROTATION_TIME = 1000; // 2 minutos
+const VIDEO_ROTATION_TIME = 4000; // 4 minutos
 let videoPlaylist = [];
 let currentVideoIndex = 0;
 let videoTimer = null;
@@ -488,3 +488,4 @@ window.onload = () => {
   carregarBanners();
   carregarVideoHero(); // 👈 ADICIONADO
 };
+
