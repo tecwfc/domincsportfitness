@@ -1,7 +1,7 @@
 // CONFIGURAÇÕES GERAIS
 // const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS81c2V8WFE0NbViXmuT-5k2kv78BUDgIT_nY7wDjOVYN078GJmpBlo_3SUrntbu0g72I0AV37-NnYF/pub?output=csv";
 
-const VIDEO_ROTATION_TIME = 1000; // 4 ms)
+const VIDEO_ROTATION_TIME = 120000; // 2 minutos
 let videoPlaylist = [];
 let currentVideoIndex = 0;
 let videoTimer = null;
@@ -344,30 +344,31 @@ async function carregarVideoHero() {
         if (rows.length < 2) return;
 
         const headers = rows[0].map(h => h.replace(/"/g, "").trim());
-        const videos = rows.slice(1).map(row => {
-            let obj = {};
-            headers.forEach((h, i) => {
-                obj[h] = row[i]?.replace(/"/g, "").trim();
-            });
-            return obj;
-        });
 
-        const ativo = videos.find(v => v.ativo === "TRUE" && v.tipo === "mp4");
-        if (!ativo) return;
+        videoPlaylist = rows.slice(1)
+            .map(row => {
+                let obj = {};
+                headers.forEach((h, i) => {
+                    obj[h] = row[i]?.replace(/"/g, "").trim();
+                });
+                return obj;
+            })
+            .filter(v => v.ativo === "TRUE");
 
-        const video = document.getElementById("hero-video");
+        if (videoPlaylist.length === 0) return;
 
-        video.innerHTML = `<source src="${ativo.video_url}" type="video/mp4">`;
+        currentVideoIndex = 0;
+        renderVideo(videoPlaylist[0]);
 
-        if (ativo.poster) {
-            video.setAttribute("poster", ativo.poster);
+        if (videoPlaylist.length > 1) {
+            iniciarRotacaoVideos();
         }
 
-        video.load();
     } catch (e) {
-        console.error("Erro ao carregar vídeo:", e);
+        console.error("Erro ao carregar vídeos:", e);
     }
 }
+
 
 
 function renderVideo(video) {
