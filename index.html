@@ -43,40 +43,61 @@
             backdrop-filter: blur(10px);
         }
 
-
         @keyframes slideLeft {
-            from {
-                transform: translateX(100%);
-            }
-
-            to {
-                transform: translateX(0);
-            }
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
         }
 
         .animate-slide-left {
             animation: slideLeft 0.4s ease-out;
         }
 
+        .swiper { width: 100%; height: 100%; }
+
+        .heroSwiper,
+        .heroSwiper .swiper-wrapper,
+        .heroSwiper .swiper-slide {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Destaques: imagens completas, botão visível */
+.destaquesSwiper .swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: stretch; /* força o card a ocupar toda altura */
+}
+
+.destaquesSwiper .swiper-slide img {
+  object-fit: contain; /* não corta a imagem */
+  width: 100%;
+  height: auto; /* adapta altura conforme largura */
+}
+
+.destaquesSwiper .swiper-wrapper {
+  align-items: stretch; /* garante altura dos slides igual */
+}
+
+.destaquesSwiper .swiper-slide > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 380px; /* altura fixa para todos os cards */
+}
+
+
+/* Remover max-height fixo */
+.destaquesSwiper {
+  max-height: none; /* deixa o Swiper se ajustar ao conteúdo */
+}
+
+
+        @media (min-width: 768px) {
+            .destaquesSwiper { max-height: 420px; }
+        }
         
-    /* Força o slide a respeitar a largura do container pai */
-    .swiper {
-        width: 100%;
-        height: 100%;
-    }
 
-    .swiper-slide {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        height: auto !important; /* Ajusta a altura conforme o conteúdo */
-    }
-
-    /* Ajuste para que as bolinhas da paginação não sumam no mobile */
-    .swiper-pagination-bullet-active {
-        background: #8e5fb1 !important; /* Cor da sua marca */
-    }
-
+        
     </style>
 </head>
 
@@ -85,142 +106,109 @@
     <header class="glass fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center border-b border-black/5">
         <div class="flex items-center gap-4 group cursor-pointer">
             <div class="relative">
-                <div
-                    class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
-                </div>
+                <div class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
                 <img src="assets/logo_dominc.png" alt="Logo Dominc"
                     class="relative h-14 w-14 object-cover rounded-full border-2 border-white shadow-xl transform transition duration-500 group-hover:scale-110 group-hover:rotate-3">
             </div>
-
             <div class="flex flex-col flex-start leading-tight">
-                <h1
-                    class="font-black text-2xl text-primary tracking-tighter transition-colors duration-300 group-hover:text-accent">
-                    Dominc
-                </h1>
-                <span
-                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-accent opacity-80 group-hover:opacity-100">
-                    Sport Fitness
-                </span>
+                <h1 class="font-black text-2xl text-primary tracking-tighter transition-colors duration-300 group-hover:text-accent">Dominc</h1>
+                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-accent opacity-80 group-hover:opacity-100">Sport Fitness</span>
             </div>
         </div>
         <ul class="flex items-center gap-6">
-            <li class="hidden md:block"><a href="#" class="font-semibold hover:text-primary transition">Início</a>
-            </li>
-            <li class="hidden md:block"><a href="#produtos"
-                    class="font-semibold hover:text-primary transition">Produtos</a></li>
+            <li class="hidden md:block"><a href="#" class="font-semibold hover:text-primary transition">Início</a></li>
+            <li class="hidden md:block"><a href="#produtos" class="font-semibold hover:text-primary transition">Produtos</a></li>
             <li>
-                <button id="cart-btn"
-                    class="relative bg-primary text-white p-2.5 rounded-full hover:bg-accent transition shadow-lg">
+                <button id="cart-btn" class="relative bg-primary text-white p-2.5 rounded-full hover:bg-accent transition shadow-lg">
                     <i class="fas fa-shopping-bag"></i>
                     <span id="cart-count"
                         class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">0</span>
                 </button>
             </li>
         </ul>
-        </nav>
     </header>
 
-   <section class="mt-24 px-4 max-w-7xl mx-auto">
-    <div class="flex flex-col md:flex-row bg-slate-50 rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm">
-        
-        <div class="relative w-full md:w-2/5 h-56 md:h-auto overflow-hidden">
-
-            <!-- <video id="hero-video" autoplay muted loop playsinline class="w-full h-full object-cover">
-    <source src="" type="video/mp4">
-</video> -->
-<div id="hero-video-container" class="absolute inset-0 w-full h-full"></div>
-
-
-
-
-            <!-- <video autoplay muted loop playsinline class="w-full h-full object-cover">
-                <source src="assets/video.mp4" type="video/mp4">
-            </video> -->
-            <div class="absolute top-4 left-4 bg-accent text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg">24H GELADO</div>
+    <!-- VITRINE DE PRODUTOS EM DESTAQUE -->
+    <section id="destaques" class="px-4 max-w-7xl mx-auto mt-6 mb-10 md:mt-12 md:mb-20">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl md:text-3xl font-black tracking-tight">⭐ Produtos em Destaque</h2>
         </div>
-        
-        <div class="relative flex-1 p-8 md:p-12 swiper slimSwiper w-full min-h-[350px] md:min-h-auto flex items-center">
-            <div class="swiper-wrapper">
-                
-            </div>
 
-            <div class="swiper-button-next !hidden md:!flex !text-primary !after:text-lg"></div>
-            <div class="swiper-button-prev !hidden md:!flex !text-primary !after:text-lg"></div>
-            
-            <div class="swiper-pagination !bottom-4 md:!bottom-8"></div>
+        <!-- SWIPER DESTAQUES -->
+        <div class="swiper destaquesSwiper max-h-[380px] md:max-h-[420px]">
+            <div id="destaques-container" class="swiper-wrapper"></div>
+            <div class="swiper-button-next destaque-next"></div>
+            <div class="swiper-button-prev destaque-prev"></div>
         </div>
-    </div>
-</section>
+    </section>
 
+    <!-- HERO / BANNER -->
+    <section id="hero" class="relative mt-24 w-full h-[70vh] md:h-[85vh] overflow-hidden">
+        <div class="swiper heroSwiper w-full h-full">
+            <div class="swiper-wrapper"></div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next hero-next"></div>
+            <div class="swiper-button-prev hero-prev"></div>
+        </div>
+    </section>
+
+    <!-- BUSCA -->
     <div class="px-4 mt-12 mb-8">
-        <div
-            class="max-w-xl mx-auto flex items-center bg-slate-50 border border-slate-200 px-6 py-4 rounded-full focus-within:ring-2 ring-primary/20 transition-all">
+        <div class="max-w-xl mx-auto flex items-center bg-slate-50 border border-slate-200 px-6 py-4 rounded-full focus-within:ring-2 ring-primary/20 transition-all">
             <i class="fas fa-search text-textMuted mr-4"></i>
-            <input type="text" id="search-input" placeholder="O que você está procurando hoje?"
-                class="bg-transparent border-none outline-none w-full text-sm font-medium">
+            <input type="text" id="search-input" placeholder="O que você está procurando hoje?" class="bg-transparent border-none outline-none w-full text-sm font-medium">
         </div>
     </div>
 
+    <!-- PRODUTOS -->
     <section id="produtos" class="px-4 max-w-7xl mx-auto pb-20">
-    <div class="text-center mb-10">
-        <h2 class="text-3xl font-black mb-8 tracking-tight">Coleções Premium</h2>
-
-        <div class="flex justify-start md:justify-center gap-4 overflow-x-auto pb-4 no-scrollbar">
-            
-            <button class="filtro-btn active group flex flex-col items-center min-w-[80px]" data-categoria="todos">
-                <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white group-[.active]:shadow-lg transition">
-                    <i class="fas fa-border-all text-xl"></i>
-                </div>
-                <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Todas</span>
-            </button>
-
-            <button class="filtro-btn group flex flex-col items-center min-w-[80px]" data-categoria="garrafas">
-                <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white transition">
-                    <i class="fas fa-bottle-water text-xl"></i>
-                </div>
-                <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Garrafas</span>
-            </button>
-
-            <button class="filtro-btn group flex flex-col items-center min-w-[80px]" data-categoria="roupas">
-                <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white transition">
-                    <i class="fas fa-tshirt text-xl"></i>
-                </div>
-                <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Roupas</span>
-            </button>
-
-            <button class="filtro-btn group flex flex-col items-center min-w-[80px]" data-categoria="acessorios">
-                <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white transition">
-                    <i class="fas fa-dumbbell text-xl"></i> </div>
-                <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Acessórios</span>
-            </button>
-            
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-black mb-8 tracking-tight">Coleções Premium</h2>
+            <div class="flex justify-start md:justify-center gap-4 overflow-x-auto pb-4 no-scrollbar">
+                <button class="filtro-btn active group flex flex-col items-center min-w-[80px]" data-categoria="todos">
+                    <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white group-[.active]:shadow-lg transition">
+                        <i class="fas fa-border-all text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Todas</span>
+                </button>
+                <button class="filtro-btn group flex flex-col items-center min-w-[80px]" data-categoria="garrafas">
+                    <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white transition">
+                        <i class="fas fa-bottle-water text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Garrafas</span>
+                </button>
+                <button class="filtro-btn group flex flex-col items-center min-w-[80px]" data-categoria="roupas">
+                    <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white transition">
+                        <i class="fas fa-tshirt text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Roupas</span>
+                </button>
+                <button class="filtro-btn group flex flex-col items-center min-w-[80px]" data-categoria="acessorios">
+                    <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-2 group-[.active]:bg-primary group-[.active]:text-white transition">
+                        <i class="fas fa-dumbbell text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-textMuted group-[.active]:text-primary">Acessórios</span>
+                </button>
+            </div>
         </div>
-    </div>
+        <div id="produtos-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </section>
 
-    <div id="produtos-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        </div>
-</section>
+    <!-- FOOTER -->
     <footer class="bg-slate-900 text-white pt-20 pb-10 px-6 mt-20">
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
             <div>
-                <h2 class="text-2xl font-black mb-6 italic uppercase tracking-tighter">Dominc<span
-                        class="text-accent font-light">Sport</span></h2>
-                <p class="text-slate-400 text-sm leading-relaxed mb-8">Tecnologia de isolamento térmico premium e design
-                    minimalista para sua melhor performance.</p>
+                <h2 class="text-2xl font-black mb-6 italic uppercase tracking-tighter">Dominc<span class="text-accent font-light">Sport</span></h2>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">Tecnologia de isolamento térmico premium e design minimalista para sua melhor performance.</p>
                 <div class="flex gap-4">
-                    <a href="#"
-                        class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-accent transition"><i
-                            class="fa-brands fa-instagram"></i></a>
-                    <a href="#"
-                        class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-accent transition"><i
-                            class="fa-brands fa-whatsapp"></i></a>
+                    <a href="#" class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-accent transition"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-accent transition"><i class="fa-brands fa-whatsapp"></i></a>
                 </div>
             </div>
             <div>
                 <h3 class="font-bold mb-6 text-accent">Contato</h3>
                 <ul class="text-slate-400 text-sm space-y-4">
-                    <li class="flex items-center gap-3"><i class="fa-solid fa-location-dot"></i> Juazeiro do Norte, CE
-                    </li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-location-dot"></i> Juazeiro do Norte, CE</li>
                     <li class="flex items-center gap-3"><i class="fa-solid fa-phone"></i> (88) 99904-9636</li>
                 </ul>
             </div>
@@ -234,13 +222,13 @@
         </div>
     </footer>
 
+    <!-- MODAIS -->
     <div id="cart-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-end">
         <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl animate-slide-left">
             <div class="p-6 border-b flex justify-between items-center bg-slate-50">
                 <h2 class="text-lg font-black uppercase">Sua Sacola</h2>
                 <div class="flex gap-3">
-                    <button id="clear-cart-btn"
-                        class="text-red-500 text-xs font-bold uppercase tracking-tighter">Limpar</button>
+                    <button id="clear-cart-btn" class="text-red-500 text-xs font-bold uppercase tracking-tighter">Limpar</button>
                     <button id="close-modal-btn" class="text-2xl">&times;</button>
                 </div>
             </div>
@@ -259,28 +247,19 @@
         </div>
     </div>
 
-    <div id="size-modal"
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
+    <div id="size-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl text-center">
             <h3 id="modal-step-title" class="text-xl font-black mb-1">Selecione a Cor</h3>
             <p id="size-product-name" class="text-xs text-textMuted mb-8"></p>
-
             <div id="color-step" class="flex justify-center gap-4 mb-8">
-                <button onclick="selectColor('Preto')"
-                    class="w-10 h-10 rounded-full bg-black ring-offset-2 hover:ring-2 ring-black transition"></button>
-                <button onclick="selectColor('Roxo')"
-                    class="w-10 h-10 rounded-full bg-purple-600 ring-offset-2 hover:ring-2 ring-purple-600 transition"></button>
+                <button onclick="selectColor('Preto')" class="w-10 h-10 rounded-full bg-black ring-offset-2 hover:ring-2 ring-black transition"></button>
+                <button onclick="selectColor('Roxo')" class="w-10 h-10 rounded-full bg-purple-600 ring-offset-2 hover:ring-2 ring-purple-600 transition"></button>
             </div>
-
             <div id="size-step" class="grid grid-cols-3 gap-3 hidden mb-8">
-                <button onclick="finishSelection('P')"
-                    class="py-3 border rounded-xl font-bold hover:bg-primary hover:text-white transition">P</button>
-                <button onclick="finishSelection('M')"
-                    class="py-3 border rounded-xl font-bold hover:bg-primary hover:text-white transition">M</button>
-                <button onclick="finishSelection('G')"
-                    class="py-3 border rounded-xl font-bold hover:bg-primary hover:text-white transition">G</button>
+                <button onclick="finishSelection('P')" class="py-3 border rounded-xl font-bold hover:bg-primary hover:text-white transition">P</button>
+                <button onclick="finishSelection('M')" class="py-3 border rounded-xl font-bold hover:bg-primary hover:text-white transition">M</button>
+                <button onclick="finishSelection('G')" class="py-3 border rounded-xl font-bold hover:bg-primary hover:text-white transition">G</button>
             </div>
-
             <button onclick="closeSizeModal()" class="text-red-500 font-bold text-sm hover:underline">Cancelar</button>
         </div>
     </div>
@@ -290,9 +269,9 @@
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
-
 </html>
