@@ -201,22 +201,36 @@ function addToCart(id, name, price, img) {
   Toastify({ text: "✅ Adicionado à sacola!", duration: 1500, style: { background: "#8e5fb1", borderRadius: "10px" } }).showToast();
 }
 
+
 function updateCart() {
+  // Salva no localStorage
   localStorage.setItem("cart", JSON.stringify(cart));
-  cartCount.innerText = cart.reduce((acc, item) => acc + item.quantity, 0);
+
+  // Atualiza contador do carrinho
+  cartCount.innerText = cart.reduce((total, item) => total + item.quantity, 0);
+
+  // Limpa lista de itens
   cartItemsContainer.innerHTML = "";
+
   let total = 0;
 
+  // Renderiza itens do carrinho
   cart.forEach((item) => {
     total += item.price * item.quantity;
+
     const div = document.createElement("div");
     div.className = "flex items-center gap-4 bg-slate-50 p-3 rounded-2xl";
+
     div.innerHTML = `
       <img src="${item.img}" class="w-16 h-16 rounded-xl object-cover">
       <div class="flex-1">
         <h4 class="text-xs font-bold leading-tight">${item.name}</h4>
+
         <div class="flex justify-between items-center mt-2">
-          <span class="font-bold text-primary text-sm">R$ ${item.price.toFixed(2)}</span>
+          <span class="font-bold text-primary text-sm">
+            R$ ${item.price.toFixed(2).replace(".", ",")}
+          </span>
+
           <div class="flex items-center gap-3 bg-white px-3 py-1 rounded-full border border-slate-200">
             <button onclick="changeQty('${item.id}', -1)" class="font-bold text-primary">-</button>
             <span class="text-xs font-black">${item.quantity}</span>
@@ -225,11 +239,22 @@ function updateCart() {
         </div>
       </div>
     `;
+
     cartItemsContainer.appendChild(div);
   });
 
+  // Atualiza total
   cartTotal.innerText = `R$ ${total.toFixed(2).replace(".", ",")}`;
+
+  // Mostra / esconde botão "Limpar"
+  const clearCartBtn = document.getElementById("clear-cart-btn");
+  if (cart.length === 0) {
+    clearCartBtn.classList.add("hidden");
+  } else {
+    clearCartBtn.classList.remove("hidden");
+  }
 }
+
 
 function changeQty(id, delta) {
   const item = cart.find((i) => i.id === id);
@@ -238,6 +263,14 @@ function changeQty(id, delta) {
     if (item.quantity <= 0) cart = cart.filter((i) => i.id !== id);
   }
   updateCart();
+  const clearCartBtn = document.getElementById("clear-cart-btn");
+
+if (cart.length === 0) {
+  clearCartBtn.classList.add("hidden");
+} else {
+  clearCartBtn.classList.remove("hidden");
+}
+
 }
 
 // --- MODAIS ---
@@ -305,8 +338,55 @@ document.getElementById("checkout-btn").onclick = () => {
 };
 
 // --- MODAL CARRINHO ---
-document.getElementById("cart-btn").onclick = () => { cartModal.classList.remove("hidden"); cartModal.classList.add("flex"); };
-document.getElementById("close-modal-btn").onclick = () => { cartModal.classList.add("hidden"); cartModal.classList.remove("flex"); };
+document.getElementById("cart-btn").onclick = () => { 
+cartModal.classList.remove("hidden");
+cartModal.classList.add("flex"); };
+
+document.getElementById("close-modal-btn").onclick = () => {
+  cartModal.classList.add("hidden");
+  cartModal.classList.remove("flex");
+  cartModal.classList.remove("pointer-events-none");
+};
+
+
+// --- MODAL CONFIRMAR LIMPAR ---
+const clearCartBtn = document.getElementById("clear-cart-btn");
+const confirmModal = document.getElementById("confirm-clear-modal");
+const cancelClearBtn = document.getElementById("cancel-clear-btn");
+const confirmClearBtn = document.getElementById("confirm-clear-btn");
+
+clearCartBtn.onclick = () => {
+  if (!cart.length) return;
+
+  confirmModal.classList.remove("hidden");
+  confirmModal.classList.add("flex");
+};
+
+cancelClearBtn.onclick = closeConfirmModal;
+
+confirmClearBtn.onclick = () => {
+  cart = [];
+  localStorage.removeItem("cart");
+  updateCart();
+  closeConfirmModal();
+};
+
+confirmModal.addEventListener("click", (e) => {
+  if (!e.target.closest("#confirm-clear-box")) {
+    closeConfirmModal();
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !confirmModal.classList.contains("hidden")) {
+    closeConfirmModal();
+  }
+});
+
+function closeConfirmModal() {
+  confirmModal.classList.add("hidden");
+  confirmModal.classList.remove("flex");
+}
 
 // --- BANNERS HERO ---
 async function carregarBannerHero() {
