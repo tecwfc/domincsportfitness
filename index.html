@@ -25,7 +25,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
@@ -103,7 +103,16 @@
 .animate-scale {
   animation: scaleIn .2s ease-out;
 }
-        
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.animate-breathe {
+  animation: breathe 2.5s ease-in-out infinite;
+}
+
+
     </style>
 </head>
 
@@ -287,14 +296,7 @@
     </div>
   </div>
 </div>
-<div
-  id="confirm-clear-modal"
-  class="fixed inset-0 hidden items-center justify-center bg-black/50 z-[9999]"
->
-  <div
-     id="confirm-clear-box"
-    class="bg-white rounded-3xl p-6 w-[90%] max-w-sm shadow-xl"
-  >
+
     <h3 class="font-black text-lg mb-2 text-center">
       Limpar sacola?
     </h3>
@@ -334,10 +336,11 @@
         </div>
     </div>
 
-    <a href="https://wa.me/5588999049636" target="_blank"
-        class="fixed bottom-6 right-6 bg-[#25d366] text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-xl hover:scale-110 transition-all z-40">
-        <i class="fa-brands fa-whatsapp"></i>
-    </a>
+<a href="https://wa.me/5588999049636" target="_blank"
+   class="fixed bottom-6 right-6 bg-[#25d366] text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-xl animate-breathe z-[9999]">
+  <i class="fa-brands fa-whatsapp"></i>
+</a>
+
 
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
