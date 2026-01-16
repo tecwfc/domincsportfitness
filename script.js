@@ -35,7 +35,7 @@ function driveImg(url) {
   if (!url) return "https://via.placeholder.com/400";
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (!match) return url;
-  // O $ é obrigatório para o JavaScript entender que é uma variável
+  // A sintaxe correta usa o símbolo de cifrão antes da chave
   return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w1000`;
 }
 
@@ -503,7 +503,9 @@ if (searchInputTop) {
 
     // Se o usuário começar a digitar, rola para a seção de produtos
     if (termo.length > 2) {
-      document.getElementById("produtos").scrollIntoView({ behavior: "smooth", block: "start" });
+      const sectionBusca = document.getElementById("produtos");
+      const y = sectionBusca.getBoundingClientRect().top + window.pageYOffset - 100;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }
   });
 }
@@ -551,37 +553,107 @@ window.onload = () => {
   updateCart();
 };
 
+// Fechar menu mobile ao clicar no link "Sobre"
+const linkSobreMobile = document.getElementById('link-sobre-mobile');
+if (linkSobreMobile) {
+  linkSobreMobile.addEventListener('click', () => {
+    document.getElementById('mobile-menu').classList.add('translate-x-full');
+    document.getElementById('mobile-overlay').classList.add('hidden');
+  });
+}
+
+
 // Configuração do botão flutuante de suporte
 const botaoFlutuante = document.getElementById("whatsapp-flutuante"); // Use o ID correto do seu botão
 
 if (botaoFlutuante) {
-    const saudacaoSuporte = encodeURIComponent("Olá! Vi o site da DOMINC SPORT FITNESS e gostaria de tirar uma dúvida sobre um produto.");
-    botaoFlutuante.href = `https://wa.me/5588999049636?text=${saudacaoSuporte}`;
+  const saudacaoSuporte = encodeURIComponent("Olá! Vi o site da DOMINC SPORT FITNESS e gostaria de tirar uma dúvida sobre um produto.");
+  botaoFlutuante.href = `https://wa.me/5588999049636?text=${saudacaoSuporte}`;
 }
 
 
+// Localize onde você trata o clique nas categorias e use este padrão:
 document.querySelectorAll('.filtro-menu-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', (e) => {
     const categoria = btn.getAttribute('data-categoria');
 
-    // Se for mobile, fecha o menu ao clicar
-    document.getElementById('mobile-menu').classList.add('translate-x-full');
-    document.getElementById('mobile-overlay').classList.add('hidden');
+    // 1. Feedback visual (opcional)
+    console.log("Filtrando por:", categoria);
 
+    // 2. Se for mobile (menu aberto), fecha o menu
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    if (mobileMenu && !mobileMenu.classList.contains('translate-x-full')) {
+      mobileMenu.classList.add('translate-x-full');
+      mobileOverlay.classList.add('hidden');
+    }
+
+
+
+
+    // Elementos da Busca Mobile
+    const mobileSearchOpen = document.getElementById('mobile-search-open');
+    const mobileSearchClose = document.getElementById('mobile-search-close');
+    const searchOverlay = document.getElementById('search-overlay');
+    const searchInputMobile = document.getElementById('search-input-mobile');
+
+    // Abrir Busca
+    if (mobileSearchOpen) {
+      mobileSearchOpen.addEventListener('click', () => {
+        searchOverlay.classList.remove('-translate-y-full');
+        searchInputMobile.focus(); // Foca no campo automaticamente
+      });
+    }
+
+    // Fechar Busca
+    if (mobileSearchClose) {
+      mobileSearchClose.addEventListener('click', () => {
+        searchOverlay.classList.add('-translate-y-full');
+        searchInputMobile.value = ''; // Limpa a busca ao fechar
+      });
+    }
+
+    // Lógica de Busca em Tempo Real (Mobile)
+    if (searchInputMobile) {
+      searchInputMobile.addEventListener("input", (e) => {
+        const termo = normalizarParaBusca(e.target.value);
+
+        const filtrados = allProducts.filter(p => {
+          const nome = normalizarParaBusca(p["Nome do Produto"]);
+          const categoria = normalizarParaBusca(p["Categoria"]);
+          return nome.includes(termo) || categoria.includes(termo);
+        });
+
+        renderProducts(filtrados);
+
+        // Se o usuário digitar mais de 2 letras, rola para os produtos
+        if (termo.length > 2) {
+          const sectionMob = document.getElementById("produtos");
+          const yMob = sectionMob.getBoundingClientRect().top + window.pageYOffset - 100;
+          window.scrollTo({ top: yMob, behavior: 'smooth' });
+        }
+      });
+    }
+    // 3. Lógica de Filtro
     if (categoria === 'todos') {
       renderProducts(allProducts);
     } else {
-      const filtrados = allProducts.filter(p =>
-        normalizarParaBusca(p["Categoria"]).includes(normalizarParaBusca(categoria))
-      );
+      const termoBusca = normalizarParaBusca(categoria);
+      const filtrados = allProducts.filter(p => {
+        const catProd = normalizarParaBusca(p["Categoria"]);
+        // Tratamento especial para garrafas como você já fez
+        if (termoBusca === "garrafas") {
+          return catProd.includes("garrafa") || catProd.includes("termica");
+        }
+        return catProd.includes(termoBusca);
+      });
       renderProducts(filtrados);
     }
 
-    // Rola até a seção de produtos
-    document.getElementById('produtos').scrollIntoView({ behavior: 'smooth' });
+    // 4. Rola para a seção de produtos
+    document.getElementById('produtos').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
-
 // Abrir/Fechar Menu Mobile
 const mobileMenuBtn = document.getElementById("mobile-menu-btn");
 const mobileMenu = document.getElementById("mobile-menu");
