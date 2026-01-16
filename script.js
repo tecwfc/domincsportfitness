@@ -30,21 +30,76 @@ function normalizarParaBusca(texto) {
   return texto.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-// --- FUNÇÕES DE IMAGEM DO DRIVE ---
-
+// --- FUNÇÕES DE IMAGEM DO DRIVE (CORRIGIDAS) ---
 function driveImg(url) {
-  if (!url) return "";
+  if (!url) return "https://via.placeholder.com/400";
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (!match) return url;
-  return `https://lh3.googleusercontent.com/u/0/d/${match[1]}`;
+  // O $ é obrigatório para o JavaScript entender que é uma variável
+  return `https://lh3.googleusercontent.com/u/0/d/${match[1]}=w1000`;
 }
 
 function converterDriveParaImagem(url) {
-  if (!url) return "";
-  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (!match) return url;
-  return `https://lh3.googleusercontent.com/u/0/d/${match[1]}`;
+  return driveImg(url);
 }
+
+// --- ATUALIZAÇÃO DO CARRINHO ---
+function updateCart() {
+  localStorage.setItem("cart", JSON.stringify(cart));
+  cartCount.innerText = cart.reduce((total, item) => total + item.quantity, 0);
+  cartItemsContainer.innerHTML = "";
+  subtotal = 0;
+
+  cart.forEach((item) => {
+    subtotal += item.price * item.quantity;
+    const div = document.createElement("div");
+    div.className = "flex items-center gap-3 bg-white p-2 rounded-2xl mb-2 border border-slate-100 shadow-sm";
+
+    div.innerHTML = `
+            <img src="${driveImg(item.img)}" class="w-14 h-14 rounded-xl object-cover bg-slate-50 flex-shrink-0">
+            <div class="flex-1 min-w-0 flex flex-col justify-center">
+                <h4 class="text-[11px] font-bold text-slate-700 leading-tight truncate mb-0.5">${item.name}</h4>
+                <div class="flex items-center justify-between">
+                    <p class="font-black text-primary text-xs">R$ ${item.price.toFixed(2).replace(".", ",")}</p>
+                    <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+                        <button onclick="changeQty('${item.id}', -1)" class="text-[10px] font-bold text-primary px-1">-</button>
+                        <span class="text-[10px] font-black min-w-[10px] text-center">${item.quantity}</span>
+                        <button onclick="changeQty('${item.id}', 1)" class="text-[10px] font-bold text-primary px-1">+</button>
+                    </div>
+                </div>
+            </div>`;
+    cartItemsContainer.appendChild(div);
+  });
+
+  atualizarBarraFrete();
+}
+
+// --- BARRA DE FRETE E TOTAIS ---
+function atualizarBarraFrete() {
+  const totalElement = document.getElementById("cart-total");
+  const subtotalElement = document.getElementById("cart-subtotal");
+  const shippingElement = document.getElementById("cart-shipping");
+  const bar = document.getElementById("free-shipping-bar");
+  const text = document.getElementById("free-shipping-text");
+
+  subtotalElement.innerText = `R$ ${subtotal.toFixed(2).replace(".", ",")}`;
+
+  if (subtotal >= FRETE_GRATIS_VALOR) {
+    bar.style.width = "100%";
+    text.innerHTML = "🎉 Parabéns! Você ganhou <strong>FRETE GRÁTIS</strong>";
+    shippingElement.innerText = "GRÁTIS";
+    totalElement.innerText = `R$ ${subtotal.toFixed(2).replace(".", ",")}`;
+  } else {
+    const percent = (subtotal / FRETE_GRATIS_VALOR) * 100;
+    const faltam = FRETE_GRATIS_VALOR - subtotal;
+    bar.style.width = `${percent}%`;
+    text.innerHTML = `Faltam <strong>R$ ${faltam.toFixed(2).replace(".", ",")}</strong> para Frete Grátis`;
+    shippingElement.innerText = `R$ ${TAXA_FRETE.toFixed(2).replace(".", ",")}`;
+    totalElement.innerText = `R$ ${(subtotal + TAXA_FRETE).toFixed(2).replace(".", ",")}`;
+  }
+}
+
+
 
 // --- CARREGAMENTO DE PRODUTOS ---
 async function loadProducts() {
@@ -79,7 +134,6 @@ async function loadProducts() {
     productsContainer.innerHTML = "<p class='col-span-full text-center py-10'>Erro ao carregar produtos.</p>";
   }
 }
-
 // --- RENDERIZAÇÃO DE DESTAQUES ---
 function renderDestaques(products) {
   if (!destaquesContainer) return;
@@ -87,7 +141,7 @@ function renderDestaques(products) {
   const destaques = products.filter((p) => {
     const estoque = parseInt(p["Saldo Estoque"]) || 0;
     return p["Destaque"]?.toLowerCase() === "sim" && estoque > 0;
-  }).slice(0, 4); //4 PRODUTOS EM DESTAQUE
+  }).slice(0, 6); //4 PRODUTOS EM DESTAQUE
 
   if (destaques.length === 0) {
     if (secaoDestaques) secaoDestaques.classList.add("hidden");
@@ -99,7 +153,7 @@ function renderDestaques(products) {
   destaquesContainer.innerHTML = "";
   destaques.forEach((p) => {
     const categoriaNorm = normalizarParaBusca(p["Categoria"]);
-    const isRoupa = categoriaNorm === "roupas" || categoriaNorm === "roupa";
+    const isRoupa = categoriaNorm === "feminino" || categoriaNorm === "feminino";
     let clickAction = isRoupa ? `openSizeSelector('${p["ID"]}', '${p["Nome do Produto"]}', ${p["Preço"]}, '${p["Imagem"]}')` : `addToCart('${p["ID"]}', '${p["Nome do Produto"]}', ${p["Preço"]}, '${p["Imagem"]}')`;
     let btnText = isRoupa ? "Escolher Tamanho" : "Adicionar";
 
@@ -138,8 +192,7 @@ function renderProducts(products) {
     const statusDisponivel = (p["Disponível"] || "").trim().toLowerCase();
     const isEsgotado = estoqueReal <= 0 || statusDisponivel === "esgotado";
     const categoriaNorm = normalizarParaBusca(p["Categoria"]);
-    const isRoupa = categoriaNorm === "roupas" || categoriaNorm === "roupa";
-
+    const isRoupa = categoriaNorm.includes("feminino") || categoriaNorm.includes("masculino");
     let clickAction = isEsgotado ? "" : isRoupa ? `openSizeSelector('${p["ID"]}','${p["Nome do Produto"]}',${p["Preço"]},'${p["Imagem"]}')` : `addToCart('${p["ID"]}','${p["Nome do Produto"]}',${p["Preço"]},'${p["Imagem"]}')`;
     let btnText = isEsgotado ? "Esgotado" : isRoupa ? "Escolher Tamanho" : "Adicionar";
 
@@ -163,98 +216,80 @@ function renderProducts(products) {
   });
 }
 
-// --- ADD PRODUTOS AO CARRINHO ---
+// --- FUNÇÃO PARA ADICIONAR AO CARRINHO ---
 function addToCart(id, name, price, img) {
-  const baseId = id.toString().split("-")[0];
-  const product = allProducts.find(p => p["ID"] == baseId);
+  // Verifica se o item já existe no carrinho
+  const existingItem = cart.find(item => item.id === id);
 
-  if (!product || product["Saldo Estoque"] <= 0) {
-    Toastify({ text: "❌ Produto esgotado", duration: 2000, style: { background: "#dc2626", borderRadius: "10px" } }).showToast();
-    return;
-  }
-
-  const existingItem = cart.find((item) => item.id === id);
-  if (existingItem) existingItem.quantity += 1;
-  else cart.push({ id, name, price, img, quantity: 1 });
-
-  updateCart();
-  Toastify({ text: "✅ Adicionado à sacola!", duration: 1500, style: { background: "#8e5fb1", borderRadius: "10px" } }).showToast();
-}
-
-//CARRINHO
-// --- CARRINHO MODERNO E COMPACTO ---
-// --- CARRINHO MODERNO E COMPACTO ---
-function updateCart() {
-  localStorage.setItem("cart", JSON.stringify(cart));
-  cartCount.innerText = cart.reduce((total, item) => total + item.quantity, 0);
-  
-  cartItemsContainer.innerHTML = "";
-  subtotal = 0; 
-
-  cart.forEach((item) => {
-    subtotal += item.price * item.quantity;
-    const div = document.createElement("div");
-    
-    // Design ultra compacto: padding menor (p-2) e gap reduzido (gap-3)
-    div.className = "flex items-center gap-3 bg-white p-2 rounded-2xl mb-2 border border-slate-100 shadow-sm transition-all";
-    
-    div.innerHTML = `
-      <img src="${item.img}" class="w-14 h-14 rounded-xl object-cover bg-slate-50 flex-shrink-0">
-      
-      <div class="flex-1 min-w-0 flex flex-col justify-center">
-        <h4 class="text-[11px] font-bold text-slate-700 leading-tight truncate mb-0.5">${item.name}</h4>
-        
-        <div class="flex items-center justify-between">
-          <p class="font-black text-primary text-xs">
-            R$ ${item.price.toFixed(2).replace(".", ",")}
-          </p>
-
-          <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
-            <button onclick="changeQty('${item.id}', -1)" class="text-[10px] font-bold text-primary hover:scale-125 px-1">-</button>
-            <span class="text-[10px] font-black min-w-[10px] text-center">${item.quantity}</span>
-            <button onclick="changeQty('${item.id}', 1)" class="text-[10px] font-bold text-primary hover:scale-125 px-1">+</button>
-          </div>
-        </div>
-      </div>`;
-    cartItemsContainer.appendChild(div);
-  });
-
-  // --- Lógica de Frete e Totais (Visual otimizado) ---
-  const bar = document.getElementById("free-shipping-bar");
-  const text = document.getElementById("free-shipping-text");
-  const freteEl = document.getElementById("cart-shipping");
-  let freteFinal = 0;
-
-  if (subtotal === 0) {
-    if(bar) bar.style.width = "0%";
-    if(text) text.innerText = `Frete grátis acima de R$ ${FRETE_GRATIS_VALOR}`;
-    freteFinal = 0;
-  } else if (subtotal < FRETE_GRATIS_VALOR) {
-    const falta = FRETE_GRATIS_VALOR - subtotal;
-    const porc = (subtotal / FRETE_GRATIS_VALOR) * 100;
-    if(bar) bar.style.width = porc + "%";
-    // Texto de frete menor
-    if(text) text.innerHTML = `<span class="text-[10px]">Faltam <span class="text-primary font-bold">R$ ${falta.toFixed(2).replace(".", ",")}</span> para frete grátis</span>`;
-    freteFinal = TAXA_FRETE;
+  if (existingItem) {
+    // Se já existe, apenas aumenta a quantidade
+    existingItem.quantity += 1;
   } else {
-    if(bar) bar.style.width = "100%";
-    if(text) text.innerHTML = `<span class="text-green-600 text-[10px] font-bold">Frete Grátis Liberado!</span>`;
-    freteFinal = 0;
+    // Se é novo, adiciona o objeto ao array
+    cart.push({
+      id: id,
+      name: name,
+      price: price,
+      img: img,
+      quantity: 1
+    });
   }
 
-  const totalGeral = subtotal + freteFinal;
-  
-  // Atualiza os campos de texto com fontes menores
-  const subtotalEl = document.getElementById("cart-subtotal");
-  if(subtotalEl) subtotalEl.innerText = `R$ ${subtotal.toFixed(2).replace(".", ",")}`;
-  
-  if(freteEl) freteEl.innerText = freteFinal === 0 ? "GRÁTIS" : `R$ ${freteFinal.toFixed(2).replace(".", ",")}`;
-  
-  cartTotal.innerText = `R$ ${totalGeral.toFixed(2).replace(".", ",")}`;
+  // Mostra um aviso visual que o produto foi adicionado
+  Toastify({
+    text: `${name} adicionado à sacola!`,
+    duration: 2000,
+    gravity: "bottom",
+    position: "right",
+    style: {
+      background: "#8e5fb1",
+      borderRadius: "12px",
+      fontSize: "12px"
+    }
+  }).showToast();
 
-  const clearCartBtn = document.getElementById("clear-cart-btn");
-  cart.length === 0 ? clearCartBtn.classList.add("hidden") : clearCartBtn.classList.remove("hidden");
+  // Atualiza o visual do carrinho e o contador do topo
+  updateCart();
 }
+
+// --- Lógica de Frete e Totais (Visual otimizado) ---
+const bar = document.getElementById("free-shipping-bar");
+const text = document.getElementById("free-shipping-text");
+const freteEl = document.getElementById("cart-shipping");
+let freteFinal = 0;
+
+if (subtotal === 0) {
+  if (bar) bar.style.width = "0%";
+  if (text) text.innerText = `Frete grátis acima de R$ ${FRETE_GRATIS_VALOR}`;
+  freteFinal = 0;
+} else if (subtotal < FRETE_GRATIS_VALOR) {
+  const falta = FRETE_GRATIS_VALOR - subtotal;
+  const porc = (subtotal / FRETE_GRATIS_VALOR) * 100;
+  if (bar) bar.style.width = porc + "%";
+  // Texto de frete menor
+  if (text) text.innerHTML = `<span class="text-[10px]">Faltam <span class="text-primary font-bold">R$ ${falta.toFixed(2).replace(".", ",")}</span> para frete grátis</span>`;
+  freteFinal = TAXA_FRETE;
+} else {
+  if (bar) bar.style.width = "100%";
+  if (text) text.innerHTML = `<span class="text-green-600 text-[10px] font-bold">Frete Grátis Liberado!</span>`;
+  freteFinal = 0;
+}
+
+const totalGeral = subtotal + freteFinal;
+
+// Atualiza os campos de texto com fontes menores
+const subtotalEl = document.getElementById("cart-subtotal");
+if (subtotalEl) subtotalEl.innerText = `R$ ${subtotal.toFixed(2).replace(".", ",")}`;
+
+if (freteEl) freteEl.innerText = freteFinal === 0 ? "GRÁTIS" : `R$ ${freteFinal.toFixed(2).replace(".", ",")}`;
+
+cartTotal.innerText = `R$ ${totalGeral.toFixed(2).replace(".", ",")}`;
+
+const clearCartBtn = document.getElementById("clear-cart-btn");
+cart.length === 0 ? clearCartBtn.classList.add("hidden") : clearCartBtn.classList.remove("hidden");
+
+
+// ... (outras funções do carrinho)
 
 function changeQty(id, delta) {
   const item = cart.find((i) => i.id === id);
@@ -265,25 +300,45 @@ function changeQty(id, delta) {
   updateCart();
 }
 
-// --- MODAIS ---
+// REMOVE ITENS
+function removeItem(id) {
+  cart = cart.filter(item => item.id !== id);
+  updateCart();
+}
+
+// ... (abaixo vem a função updateCart)
+
+// --- MODAIS DE CORES E TAMANHOS ---
 function openSizeSelector(id, name, price, img) {
   tempProduct = { id, name, price, img };
   document.getElementById("size-product-name").innerText = name;
+
+  // Reseta o modal para o primeiro passo (Cores)
+  document.getElementById("modal-step-title").innerText = "Selecione a Cor";
+  document.getElementById("color-step").classList.remove("hidden");
+  document.getElementById("size-step").classList.add("hidden");
+
   document.getElementById("size-modal").classList.remove("hidden");
   document.getElementById("size-modal").classList.add("flex");
 }
 
 function selectColor(color) {
   selectedColor = color;
-  document.getElementById("modal-step-title").innerText = "Tamanho";
+  // Passa para o próximo passo (Tamanhos)
+  document.getElementById("modal-step-title").innerText = "Selecione o Tamanho";
   document.getElementById("color-step").classList.add("hidden");
   document.getElementById("size-step").classList.remove("hidden");
 }
 
 function finishSelection(size) {
-  const finalName = `${tempProduct.name} (${selectedColor} / ${size})`;
-  addToCart(`${tempProduct.id}-${selectedColor}-${size}`, finalName, tempProduct.price, tempProduct.img);
-  closeSizeModal();
+  if (tempProduct) {
+    // Cria um ID único combinando ID+Cor+Tamanho para não misturar no carrinho
+    const uniqueId = `${tempProduct.id}-${selectedColor}-${size}`;
+    const fullName = `${tempProduct.name} (${selectedColor} / ${size})`;
+
+    addToCart(uniqueId, fullName, tempProduct.price, tempProduct.img);
+    closeSizeModal();
+  }
 }
 
 function closeSizeModal() {
@@ -310,12 +365,6 @@ document.addEventListener("click", (e) => {
   document.getElementById("produtos").scrollIntoView({ behavior: "smooth" });
 });
 
-document.getElementById("search-input").addEventListener("input", (e) => {
-  const term = normalizarParaBusca(e.target.value);
-  const filtered = allProducts.filter((p) => normalizarParaBusca(p["Nome do Produto"]).includes(term) || normalizarParaBusca(p["Categoria"]).includes(term));
-  renderProducts(filtered);
-});
-
 // --- WHATSAPP (CORREÇÃO FINAL AQUI) ---
 document.addEventListener("DOMContentLoaded", () => {
   const checkoutBtn = document.getElementById("checkout-btn");
@@ -336,7 +385,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const itensTxt = cart.map(i => `✅ *${i.quantity}x* ${i.name}`).join("\n");
         const msg = encodeURIComponent(
-          `*📦 NOVO PEDIDO - DOMINC*\n\n` +
+          `*Olá, segue meu pedido da loja:* 🛍️\n\n` + // Mensagem de boas-vindas
+          `*📦 NOVO PEDIDO - DOMINC SPORT FITNESS*\n\n` +
           `*ITENS:*\n${itensTxt}\n\n` +
           `--------------------------\n` +
           `*Subtotal:* R$ ${subtotalLocal.toFixed(2).replace(".", ",")}\n` +
@@ -392,30 +442,164 @@ async function carregarBannerHero() {
 }
 
 
+// Lógica para os botões de filtro do menu suspenso
+
+document.querySelectorAll(".filtro-menu-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const categoriaAlvo = normalizarParaBusca(btn.getAttribute("data-categoria"));
+
+    console.log("Filtrando por:", categoriaAlvo); // Para você testar no console F12
+
+    let produtosFiltrados;
+
+    if (categoriaAlvo === "todos") {
+      produtosFiltrados = allProducts;
+    } else {
+      produtosFiltrados = allProducts.filter(p => {
+        const categoriaPlanilha = normalizarParaBusca(p["Categoria"]);
+
+        // Lógica especial para garrafas (pega garrafa, térmica, etc)
+        if (categoriaAlvo === "garrafas") {
+          return categoriaPlanilha.includes("garrafa") || categoriaPlanilha.includes("termica");
+        }
+
+        // Lógica para Feminino (pega se na planilha estiver 'roupa feminino' ou só 'feminino')
+        if (categoriaAlvo === "feminino") {
+          return categoriaPlanilha.includes("feminino");
+        }
+
+        // Lógica para Masculino
+        if (categoriaAlvo === "masculino") {
+          return categoriaPlanilha.includes("masculino");
+        }
+
+        // Para acessórios e outros (comparação flexível)
+        return categoriaPlanilha.includes(categoriaAlvo);
+      });
+    }
+
+    renderProducts(produtosFiltrados);
+
+    // Rola para a seção de produtos
+    const sectionProdutos = document.getElementById("produtos");
+    if (sectionProdutos) sectionProdutos.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+// Busca em tempo real
+const searchInputTop = document.getElementById("search-input-top");
+
+if (searchInputTop) {
+  searchInputTop.addEventListener("input", (e) => {
+    const termo = normalizarParaBusca(e.target.value);
+
+    const filtrados = allProducts.filter(p => {
+      const nome = normalizarParaBusca(p["Nome do Produto"]);
+      const categoria = normalizarParaBusca(p["Categoria"]);
+      return nome.includes(termo) || categoria.includes(termo);
+    });
+
+    renderProducts(filtrados);
+
+    // Se o usuário começar a digitar, rola para a seção de produtos
+    if (termo.length > 2) {
+      document.getElementById("produtos").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+}
 // 1. Fechar ao clicar fora do modal
 cartModal.addEventListener("click", (event) => {
-    // Se o clique foi no fundo (cart-modal) e não no conteúdo branco
-    if (event.target === cartModal) {
-        cartModal.classList.remove("flex");
-        cartModal.classList.add("hidden");
-    }
+  // Se o clique foi no fundo (cart-modal) e não no conteúdo branco
+  if (event.target === cartModal) {
+    cartModal.classList.remove("flex");
+    cartModal.classList.add("hidden");
+  }
 });
 
 // 2. Fechar ao apertar a tecla ESC
 document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !cartModal.classList.contains("hidden")) {
-        cartModal.classList.remove("flex");
-        cartModal.classList.add("hidden");
-    }
+  if (event.key === "Escape" && !cartModal.classList.contains("hidden")) {
+    cartModal.classList.remove("flex");
+    cartModal.classList.add("hidden");
+  }
 });
 
 // Caso ainda não tenha no seu script.js
 const closeModalBtn = document.getElementById("close-modal-btn");
 
 closeModalBtn.addEventListener("click", () => {
-    cartModal.classList.remove("flex");
-    cartModal.classList.add("hidden");
+  cartModal.classList.remove("flex");
+  cartModal.classList.add("hidden");
 });
 
 
-window.onload = () => { loadProducts(); updateCart(); carregarBannerHero(); };
+document.getElementById("checkout-btn").addEventListener("click", () => {
+  if (cart.length === 0) return alert("Sua sacola está vazia!");
+  if (!addressInput.value) return alert("Por favor, informe o endereço!");
+
+  const mensagem = cart.map(i => `*${i.quantity}x* ${i.name}`).join("\n");
+  const total = cartTotal.innerText;
+  const link = `https://wa.me/5588999049636?text=${encodeURIComponent(`Novo Pedido:\n${mensagem}\n\nTotal: ${total}\nEndereço: ${addressInput.value}`)}`;
+
+  window.open(link, "_blank");
+});
+
+
+window.onload = () => {
+  loadProducts();
+  carregarBannerHero(); // Certifique-se que esta função está sendo chamada
+  updateCart();
+};
+
+// Configuração do botão flutuante de suporte
+const botaoFlutuante = document.getElementById("whatsapp-flutuante"); // Use o ID correto do seu botão
+
+if (botaoFlutuante) {
+    const saudacaoSuporte = encodeURIComponent("Olá! Vi o site da DOMINC SPORT FITNESS e gostaria de tirar uma dúvida sobre um produto.");
+    botaoFlutuante.href = `https://wa.me/5588999049636?text=${saudacaoSuporte}`;
+}
+
+
+document.querySelectorAll('.filtro-menu-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const categoria = btn.getAttribute('data-categoria');
+
+    // Se for mobile, fecha o menu ao clicar
+    document.getElementById('mobile-menu').classList.add('translate-x-full');
+    document.getElementById('mobile-overlay').classList.add('hidden');
+
+    if (categoria === 'todos') {
+      renderProducts(allProducts);
+    } else {
+      const filtrados = allProducts.filter(p =>
+        normalizarParaBusca(p["Categoria"]).includes(normalizarParaBusca(categoria))
+      );
+      renderProducts(filtrados);
+    }
+
+    // Rola até a seção de produtos
+    document.getElementById('produtos').scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// Abrir/Fechar Menu Mobile
+const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+const mobileMenu = document.getElementById("mobile-menu");
+const mobileOverlay = document.getElementById("mobile-overlay");
+const closeMobileMenu = document.getElementById("close-mobile-menu");
+
+if (mobileMenuBtn) {
+  mobileMenuBtn.onclick = () => {
+    mobileMenu.classList.remove("translate-x-full");
+    mobileOverlay.classList.remove("hidden");
+  };
+}
+
+if (closeMobileMenu || mobileOverlay) {
+  const close = () => {
+    mobileMenu.classList.add("translate-x-full");
+    mobileOverlay.classList.add("hidden");
+  };
+  if (closeMobileMenu) closeMobileMenu.onclick = close;
+  if (mobileOverlay) mobileOverlay.onclick = close;
+}
