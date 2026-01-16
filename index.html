@@ -193,83 +193,183 @@
 
 <body class="bg-white text-textDark">
 
-    <header class="glass fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center border-b border-black/5">
-        <div class="flex items-center gap-4 group cursor-pointer"
-            onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-            <div class="relative">
-                <div
-                    class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
-                </div>
-                <img src="assets/logo_dominc.png" alt="Logo Dominc"
-                    class="relative h-14 w-14 object-cover rounded-full border-2 border-white shadow-xl transform transition duration-500 group-hover:scale-110 group-hover:rotate-3">
-            </div>
-            <div class="flex flex-col leading-tight">
-                <h1 class="font-black text-2xl text-primary tracking-tighter group-hover:text-accent transition-colors">
-                    Dominc</h1>
-                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-accent opacity-80">Sport
-                    Fitness</span>
-            </div>
+    <header class="glass fixed top-0 w-full z-50 px-4 md:px-6 py-3 md:py-4 flex justify-between items-center border-b border-black/5">
+    
+    <div class="flex items-center gap-3 group cursor-pointer shrink-0" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <div class="relative">
+            <div class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000"></div>
+            <img src="assets/logo_dominc.png" alt="Logo" class="relative h-10 w-10 md:h-12 lg:h-14 md:w-12 lg:w-14 object-cover rounded-full border-2 border-white shadow-xl">
+        </div>
+        <div class="flex flex-col leading-tight">
+            <h1 class="font-black text-lg md:text-xl lg:text-2xl text-primary tracking-tighter">Dominc</h1>
+            <span class="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-accent opacity-80">Sport Fitness</span>
+        </div>
+    </div>
+
+    <nav class="hidden md:flex items-center justify-center flex-1">
+        <ul class="flex items-center gap-4 lg:gap-8">
+            <li><button class="filtro-menu-btn text-[10px] font-black uppercase tracking-widest hover:text-primary transition" data-categoria="todos">Início</button></li>
+            <li><button class="filtro-menu-btn text-[10px] font-black uppercase tracking-widest hover:text-primary transition" data-categoria="feminino">Feminino</button></li>
+            <li><button class="filtro-menu-btn text-[10px] font-black uppercase tracking-widest hover:text-primary transition" data-categoria="masculino">Masculino</button></li>
+            <li><button class="filtro-menu-btn text-[10px] font-black uppercase tracking-widest hover:text-primary transition" data-categoria="garrafas">Garrafas</button></li>
+            <li><button class="filtro-menu-btn text-[10px] font-black uppercase tracking-widest hover:text-primary transition" data-categoria="acessorios">Acessórios</button></li>
+            <li><a href="#sobre-empresa" class="text-[10px] font-black uppercase tracking-widest hover:text-primary transition">Sobre</a></li>
+        </ul>
+    </nav>
+
+    <div class="flex items-center gap-1 md:gap-4 shrink-0">
+        
+        <div class="hidden xl:flex items-center bg-slate-100 px-4 py-2 rounded-full border border-transparent focus-within:border-primary/30 transition-all w-40 lg:w-48">
+            <i class="fas fa-search text-textMuted text-xs mr-2"></i>
+            <input type="text" id="search-input-top" placeholder="Buscar..." class="bg-transparent border-none outline-none text-[10px] font-bold w-full">
         </div>
 
-        <div class="flex items-center gap-4 md:gap-6 flex-1 justify-end">
-            <div
-                class="hidden lg:flex items-center bg-slate-100 px-4 py-2 rounded-full border border-transparent focus-within:border-primary/30 transition-all w-48 xl:w-64">
-                <i class="fas fa-search text-textMuted text-xs mr-2"></i>
-                <input type="text" id="search-input-top" placeholder="O que você está procurando hoje?"
-                    class="bg-transparent border-none outline-none text-xs font-medium w-full">
-            </div>
+        <button id="mobile-search-open" class="md:hidden text-primary p-3 rounded-xl active:scale-95 transition-all">
+            <i class="fa-solid fa-magnifying-glass text-xl"></i>
+        </button>
 
-            <ul class="flex items-center gap-3 md:gap-5">
-                <li class="hidden lg:block">
-                    <button onclick="window.location.reload()"
-                        class="text-[10px] font-black uppercase tracking-widest hover:text-primary transition">Início</button>
-                </li>
-                <li class="hidden md:block">
-                    <button
-                        class="filtro-menu-btn text-[10px] font-black uppercase tracking-widest hover:text-primary transition"
-                        data-categoria="todos">Todos</button>
-                </li>
-                <li class="hidden md:block">
-                    <button
-                        class="filtro-menu-btn text-[10px] font-black uppercase tracking-widest hover:text-primary transition"
-                        data-categoria="feminino">Feminino</button>
-                </li>
-                <li class="hidden md:block">
-                    <button
-                        class="filtro-menu-btn text-[10px] font-black uppercase tracking-widest hover:text-primary transition"
-                        data-categoria="masculino">Masculino</button>
-                </li>
-                <li class="hidden md:block">
-                    <button
-                        class="filtro-menu-btn text-[10px] font-black uppercase tracking-widest hover:text-primary transition"
-                        data-categoria="garrafas">Garrafas</button>
-                </li>
-                <li class="hidden md:block">
-                    <button
-                        class="filtro-menu-btn text-[10px] font-black uppercase tracking-widest hover:text-primary transition"
-                        data-categoria="acessorios">Acessórios</button>
-                </li>
+        <button id="cart-btn" class="relative bg-primary text-white p-3 md:p-2.5 rounded-xl md:rounded-full hover:bg-accent transition shadow-lg active:scale-95">
+            <i class="fas fa-shopping-bag text-lg md:text-base"></i>
+            <span id="cart-count" class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">0</span>
+        </button>
 
-                <a href="#sobre-empresa"
-                    class="px-4 py-2 font-bold text-slate-700 hover:text-primary transition">Sobre</a>
+        <button id="mobile-menu-btn" class="md:hidden text-primary bg-slate-100 p-3 rounded-xl active:scale-95 transition-all">
+            <i class="fa-solid fa-bars-staggered text-xl"></i>
+        </button>
+    </div>
+</header>
 
-                <li>
-                    <button id="cart-btn"
-                        class="relative bg-primary text-white p-2.5 rounded-full hover:bg-accent transition shadow-lg">
-                        <i class="fas fa-shopping-bag"></i>
-                        <span id="cart-count"
-                            class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">0</span>
-                    </button>
-                </li>
-
-                <li class="md:hidden">
-                    <button id="mobile-menu-btn" class="text-primary text-xl p-2">
-                        <i class="fa-solid fa-bars-staggered"></i>
-                    </button>
-                </li>
-            </ul>
+    <div id="search-overlay" class="fixed inset-x-0 top-0 h-20 bg-white z-[100] transform -translate-y-full transition-transform duration-300 ease-in-out shadow-xl flex items-center px-4 gap-3">
+        <div class="flex-1 flex items-center bg-slate-100 rounded-2xl px-4 py-3 border border-primary/20">
+            <i class="fas fa-search text-primary mr-3"></i>
+            <input type="text" id="search-input-mobile" placeholder="O que você procura?" 
+                   class="bg-transparent border-none outline-none text-sm font-bold w-full text-slate-700">
         </div>
-    </header>
+        <button id="mobile-search-close" class="p-2 text-slate-400 font-bold text-sm uppercase">
+            Fechar
+        </button>
+    </div>
+
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-[60] hidden backdrop-blur-sm transition-opacity duration-300"></div>
+
+    <div id="mobile-menu" class="fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+            <div class="flex flex-col">
+                <span class="text-primary font-black text-xl tracking-tighter">Menu</span>
+                <span class="text-[10px] text-accent font-bold uppercase tracking-widest">Navegação</span>
+            </div>
+            <button id="close-mobile-menu" class="h-10 w-10 flex items-center justify-center rounded-full bg-white shadow-sm text-primary">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6">
+            <nav class="space-y-4">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Categorias</p>
+                <button class="filtro-menu-btn w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-primary/5 text-slate-700 font-bold transition-all" data-categoria="todos">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-house text-primary/60"></i> Início</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
+                </button>
+                <button class="filtro-menu-btn w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-primary/5 text-slate-700 font-bold transition-all" data-categoria="feminino">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-venus text-primary/60"></i> Feminino</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
+                </button>
+                <button class="filtro-menu-btn w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-primary/5 text-slate-700 font-bold transition-all" data-categoria="masculino">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-mars text-primary/60"></i> Masculino</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
+                </button>
+                <button class="filtro-menu-btn w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-primary/5 text-slate-700 font-bold transition-all" data-categoria="garrafas">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-bottle-water text-primary/60"></i> Garrafas</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
+                </button>
+                <button class="filtro-menu-btn w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-primary/5 text-slate-700 font-bold transition-all" data-categoria="acessorios">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-dumbbell text-primary/60"></i> Acessórios</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
+                </button>
+                <hr class="my-6 border-slate-100">
+                <a href="#sobre-empresa" id="link-sobre-mobile" class="w-full flex items-center gap-3 p-4 text-slate-500 font-medium">
+                    <i class="fa-solid fa-circle-info"></i> Sobre a Dominc
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-6 border-t border-slate-100">
+            <a href="https://wa.me/5588999049636" target="_blank" class="flex items-center justify-center gap-2 w-full bg-green-500 text-white p-4 rounded-2xl font-bold shadow-lg shadow-green-200">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp
+            </a>
+        </div>
+    </div>
+
+  <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-[60] hidden backdrop-blur-sm transition-opacity duration-300"></div>
+
+<div id="mobile-menu" class="fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    
+    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <div class="flex flex-col">
+            <span class="text-primary font-black text-xl tracking-tighter">Menu</span>
+            <span class="text-[10px] text-accent font-bold uppercase tracking-widest">Navegação</span>
+        </div>
+        <button id="close-mobile-menu" class="h-10 w-10 flex items-center justify-center rounded-full bg-white shadow-sm text-primary">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-6">
+        <nav class="space-y-4">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Categorias</p>
+            
+            <button class="filtro-menu-btn w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-primary/5 text-slate-700 font-bold transition-all border border-transparent active:border-primary/20" data-categoria="todos">
+                <span class="flex items-center gap-3"><i class="fa-solid fa-house text-primary/60"></i> Início</span>
+                <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
+            </button>
+
+            <button class="filtro-menu-btn w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-primary/5 text-slate-700 font-bold transition-all" data-categoria="feminino">
+                <span class="flex items-center gap-3"><i class="fa-solid fa-venus text-primary/60"></i> Feminino</span>
+                <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
+            </button>
+
+            <button class="filtro-menu-btn w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-primary/5 text-slate-700 font-bold transition-all" data-categoria="masculino">
+                <span class="flex items-center gap-3"><i class="fa-solid fa-mars text-primary/60"></i> Masculino</span>
+                <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
+            </button>
+
+            <button class="filtro-menu-btn w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-primary/5 text-slate-700 font-bold transition-all" data-categoria="garrafas">
+                <span class="flex items-center gap-3"><i class="fa-solid fa-bottle-water text-primary/60"></i> Garrafas</span>
+                <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
+            </button>
+
+            <button class="filtro-menu-btn w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-primary/5 text-slate-700 font-bold transition-all" data-categoria="acessorios">
+                <span class="flex items-center gap-3"><i class="fa-solid fa-dumbbell text-primary/60"></i> Acessórios</span>
+                <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
+            </button>
+
+            <hr class="my-6 border-slate-100">
+
+            <a href="#sobre-empresa" id="link-sobre-mobile" class="w-full flex items-center gap-3 p-4 text-slate-500 font-medium">
+                <i class="fa-solid fa-circle-info"></i> Sobre a Dominc
+            </a>
+        </nav>
+    </div>
+
+    <div class="p-6 border-t border-slate-100">
+        <a href="https://wa.me/5588999049636" target="_blank" class="flex items-center justify-center gap-2 w-full bg-green-500 text-white p-4 rounded-2xl font-bold shadow-lg shadow-green-200">
+            <i class="fa-brands fa-whatsapp"></i>
+            Suporte via WhatsApp
+        </a>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
 
     <div id="mobile-menu"
         class="fixed inset-y-0 right-0 w-72 bg-white z-[60] transform translate-x-full transition-transform duration-300 shadow-2xl md:hidden">
@@ -294,6 +394,9 @@
                 <button
                     class="filtro-menu-btn text-left text-[11px] font-black uppercase tracking-widest border-b border-slate-50 pb-3"
                     data-categoria="acessorios">🎒 Acessórios Diversos</button>
+                <button
+                    class="filtro-menu-btn text-left text-[11px] font-black uppercase tracking-widest border-b border-slate-50 pb-3"
+                    data-categoria="sobre-empresa">🎒 Sobre a empresa</button>
             </nav>
         </div>
     </div>
@@ -483,67 +586,67 @@
 
     <!-- SOBRE A EMPRESA -->
     <footer id="sobre-empresa" class="bg-slate-900 text-white pt-20 pb-10 px-6 mt-20 border-t border-white/5">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
-        
-        <div>
-            <h2 class="text-2xl font-black mb-6 italic uppercase tracking-tighter">
-                Dominc<span class="text-accent font-light">Sport</span>
-            </h2>
-            <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                A <strong>DOMINC</strong> nasceu com o propósito de unir estilo, praticidade e qualidade. 
-                Nossa curadoria é feita para quem não abre mão de produtos que acompanham o ritmo do dia a dia, 
-                oferecendo uma experiência única de compra com atendimento humanizado.
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+
+            <div>
+                <h2 class="text-2xl font-black mb-6 italic uppercase tracking-tighter">
+                    Dominc<span class="text-accent font-light">Sport</span>
+                </h2>
+                <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                    A <strong>DOMINC</strong> nasceu com o propósito de unir estilo, praticidade e qualidade.
+                    Nossa curadoria é feita para quem não abre mão de produtos que acompanham o ritmo do dia a dia,
+                    oferecendo uma experiência única de compra com atendimento humanizado.
+                </p>
+
+                <div class="flex gap-4">
+                    <a href="https://www.instagram.com/SEU_USER" target="_blank"
+                        class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-accent transition duration-300">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://wa.me/5588999049636" target="_blank"
+                        class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-accent transition duration-300">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-bold mb-6 text-accent uppercase text-sm tracking-widest">Contato</h3>
+                <ul class="text-slate-400 text-sm space-y-4">
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-location-dot text-accent"></i> Juazeiro do Norte, CE
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-phone text-accent"></i> (88) 99904-9636
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-envelope text-accent"></i> contato@dominc.com.br
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="font-bold mb-6 text-accent uppercase text-sm tracking-widest">Pagamento</h3>
+                <div class="flex gap-4 text-3xl text-slate-500 mb-8">
+                    <i class="fa-brands fa-pix hover:text-white transition"></i>
+                    <i class="fa-brands fa-cc-visa hover:text-white transition"></i>
+                    <i class="fa-brands fa-cc-mastercard hover:text-white transition"></i>
+                </div>
+
+                <h3 class="font-bold mb-4 text-accent uppercase text-sm tracking-widest">Segurança</h3>
+                <div class="flex items-center gap-2 text-slate-400 text-xs">
+                    <i class="fa-solid fa-shield-halved text-green-500 text-lg"></i>
+                    <span>Site Protegido com SSL</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto mt-16 pt-8 border-t border-white/5 text-center">
+            <p class="text-slate-500 text-xs">
+                &copy; 2026 DOMINC SPORT. Todos os direitos reservados.
             </p>
-            
-            <div class="flex gap-4">
-                <a href="https://www.instagram.com/SEU_USER" target="_blank"
-                    class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-accent transition duration-300">
-                    <i class="fa-brands fa-instagram"></i>
-                </a>
-                <a href="https://wa.me/5588999049636" target="_blank"
-                    class="w-10 h-10 bg-white/5 flex items-center justify-center rounded-full hover:bg-accent transition duration-300">
-                    <i class="fa-brands fa-whatsapp"></i>
-                </a>
-            </div>
         </div>
-
-        <div>
-            <h3 class="font-bold mb-6 text-accent uppercase text-sm tracking-widest">Contato</h3>
-            <ul class="text-slate-400 text-sm space-y-4">
-                <li class="flex items-center gap-3">
-                    <i class="fa-solid fa-location-dot text-accent"></i> Juazeiro do Norte, CE
-                </li>
-                <li class="flex items-center gap-3">
-                    <i class="fa-solid fa-phone text-accent"></i> (88) 99904-9636
-                </li>
-                <li class="flex items-center gap-3">
-                    <i class="fa-solid fa-envelope text-accent"></i> contato@dominc.com.br
-                </li>
-            </ul>
-        </div>
-
-        <div>
-            <h3 class="font-bold mb-6 text-accent uppercase text-sm tracking-widest">Pagamento</h3>
-            <div class="flex gap-4 text-3xl text-slate-500 mb-8">
-                <i class="fa-brands fa-pix hover:text-white transition"></i>
-                <i class="fa-brands fa-cc-visa hover:text-white transition"></i>
-                <i class="fa-brands fa-cc-mastercard hover:text-white transition"></i>
-            </div>
-            
-            <h3 class="font-bold mb-4 text-accent uppercase text-sm tracking-widest">Segurança</h3>
-            <div class="flex items-center gap-2 text-slate-400 text-xs">
-                <i class="fa-solid fa-shield-halved text-green-500 text-lg"></i>
-                <span>Site Protegido com SSL</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="max-w-7xl mx-auto mt-16 pt-8 border-t border-white/5 text-center">
-        <p class="text-slate-500 text-xs">
-            &copy; 2026 DOMINC SPORT. Todos os direitos reservados.
-        </p>
-    </div>
-</footer>
+    </footer>
 
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
