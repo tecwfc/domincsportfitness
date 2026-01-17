@@ -90,6 +90,17 @@ function updateCart() {
             </div>`;
     cartItemsContainer.appendChild(div);
   });
+  
+   // --- Limpar Carrinho ---
+  const clearCartBtn = document.getElementById("clear-cart-btn");
+  if (clearCartBtn) {
+    if (cart.length === 0) {
+      clearCartBtn.classList.add("hidden");
+    } else {
+      clearCartBtn.classList.remove("hidden");
+    }
+  }
+  // -------------------------------
 
   atualizarBarraFrete();
 }
@@ -172,12 +183,13 @@ async function loadProducts() {
 function renderDestaques(products) {
   if (!destaquesContainer) return;
   const secaoDestaques = document.getElementById("destaques");
+  
   const destaques = products
     .filter((p) => {
       const estoque = parseInt(p["Saldo Estoque"]) || 0;
       return p["Destaque"]?.toLowerCase() === "sim" && estoque > 0;
     })
-    .slice(0, 6); //4 PRODUTOS EM DESTAQUE
+    .slice(0, 6);
 
   if (destaques.length === 0) {
     if (secaoDestaques) secaoDestaques.classList.add("hidden");
@@ -188,9 +200,12 @@ function renderDestaques(products) {
 
   destaquesContainer.innerHTML = "";
   destaques.forEach((p) => {
+    const estoqueReal = parseInt(p["Saldo Estoque"]) || 0;
+    const isUltimasUnidades = estoqueReal > 0 && estoqueReal <= 3; // Lógica de urgência
+
     const categoriaNorm = normalizarParaBusca(p["Categoria"]);
-    const isRoupa =
-      categoriaNorm === "feminino" || categoriaNorm === "feminino";
+    const isRoupa = categoriaNorm === "feminino" || categoriaNorm === "masculino";
+    
     let clickAction = isRoupa
       ? `openSizeSelector('${p["ID"]}', '${p["Nome do Produto"]}', ${p["Preço"]}, '${p["Imagem"]}')`
       : `addToCart('${p["ID"]}', '${p["Nome do Produto"]}', ${p["Preço"]}, '${p["Imagem"]}')`;
@@ -199,28 +214,29 @@ function renderDestaques(products) {
     const slide = document.createElement("div");
     slide.className = "swiper-slide flex justify-center";
     slide.innerHTML = `
-            <div class="bg-white rounded-3xl overflow-hidden border-2 border-accent shadow-lg flex flex-col max-w-xs w-full">
-                <div class="relative h-48 bg-slate-50 flex items-center justify-center">
-                    <img src="${driveImg(
-                      p["Imagem"]
-                    )}" class="max-h-full max-w-full object-contain transition duration-500"/>
-                    <span class="absolute top-3 left-3 bg-accent text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Destaque</span>
-                </div>
-                <div class="p-4 flex flex-col gap-1">
-                    <span class="text-[10px] font-bold text-accent uppercase">${
-                      p["Categoria"]
-                    }</span>
-                    <h3 class="font-bold text-sm text-textDark leading-snug h-10 overflow-hidden">${
-                      p["Nome do Produto"]
-                    }</h3>
-                    <p class="text-lg font-black text-primary mt-2">R$ ${p[
-                      "Preço"
-                    ]
-                      .toFixed(2)
-                      .replace(".", ",")}</p>
-                    <button onclick="${clickAction}" class="w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition bg-primary text-white hover:bg-accent">${btnText}</button>
-                </div>
-            </div>`;
+    <div class="bg-white rounded-3xl overflow-hidden border-2 border-accent shadow-lg flex flex-col max-w-xs w-full relative">
+        <div class="relative h-48 bg-slate-50 flex items-center justify-center">
+            <img src="${driveImg(p["Imagem"])}" class="max-h-full max-w-full object-contain transition duration-500"/>
+            
+            <span class="absolute top-3 left-3 bg-accent text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Destaque</span>
+            
+            ${isUltimasUnidades 
+                ? '<span class="absolute bottom-3 right-3 bg-orange-500 text-white text-[9px] font-black px-2 py-1 rounded-lg shadow-lg animate-pulse uppercase z-10">Últimas Unidades</span>' 
+                : ""
+            }
+        </div>
+        <div class="p-4 flex flex-col gap-1">
+            <span class="text-[10px] font-bold text-accent uppercase">${p["Categoria"]}</span>
+            <h3 class="font-bold text-sm text-textDark leading-snug h-10 overflow-hidden">${p["Nome do Produto"]}</h3>
+            
+            <p class="text-[10px] font-bold ${isUltimasUnidades ? "text-orange-500" : "text-green-600"}">
+                ${isUltimasUnidades ? `Resta(m) apenas ${estoqueReal}!` : `Em estoque: ${estoqueReal}`}
+            </p>
+
+            <p class="text-lg font-black text-primary mt-1">R$ ${p["Preço"].toFixed(2).replace(".", ",")}</p>
+            <button onclick="${clickAction}" class="w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition bg-primary text-white hover:bg-accent">${btnText}</button>
+        </div>
+    </div>`;
     destaquesContainer.appendChild(slide);
   });
 
@@ -233,6 +249,7 @@ function renderDestaques(products) {
   });
 }
 
+
 // --- RENDERIZAÇÃO DE PRODUTOS ---
 function renderProducts(products) {
   productsContainer.innerHTML = "";
@@ -240,100 +257,93 @@ function renderProducts(products) {
     const estoqueReal = parseInt(p["Saldo Estoque"]) || 0;
     const statusDisponivel = (p["Disponível"] || "").trim().toLowerCase();
     const isEsgotado = estoqueReal <= 0 || statusDisponivel === "esgotado";
+    
+    // NOVO: Gatilho de urgência para estoque baixo
+    const isUltimasUnidades = estoqueReal > 0 && estoqueReal <= 3;
+
     const categoriaNorm = normalizarParaBusca(p["Categoria"]);
-    const isRoupa =
-      categoriaNorm.includes("feminino") || categoriaNorm.includes("masculino");
+    const isRoupa = categoriaNorm.includes("feminino") || categoriaNorm.includes("masculino");
+    
     let clickAction = isEsgotado
       ? ""
       : isRoupa
       ? `openSizeSelector('${p["ID"]}','${p["Nome do Produto"]}',${p["Preço"]},'${p["Imagem"]}')`
       : `addToCart('${p["ID"]}','${p["Nome do Produto"]}',${p["Preço"]},'${p["Imagem"]}')`;
-    let btnText = isEsgotado
-      ? "Esgotado"
-      : isRoupa
-      ? "Escolher Tamanho"
-      : "Adicionar";
+    
+    let btnText = isEsgotado ? "Esgotado" : isRoupa ? "Escolher Tamanho" : "Adicionar";
 
-    const card = document.createElement("div");
-    card.className =
-      "bg-white rounded-3xl overflow-hidden border border-slate-100 group hover:shadow-xl transition-all duration-300 flex flex-col h-full";
-    card.innerHTML = `
-            <div class="relative aspect-[4/5] bg-slate-50 overflow-hidden">
-                <img src="${driveImg(
-                  p["Imagem"]
-                )}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500 ${
-      isEsgotado ? "grayscale opacity-50" : ""
-    }">
-                ${
-                  isEsgotado
-                    ? '<div class="absolute inset-0 flex items-center justify-center font-black text-red-500 uppercase tracking-widest text-sm bg-white/40 backdrop-blur-[2px]">Esgotado</div>'
-                    : ""
-                }
-            </div>
-            <div class="p-4 flex flex-col flex-1">
-                <span class="text-[10px] font-bold text-accent uppercase tracking-tighter mb-1">${
-                  p["Categoria"]
-                }</span>
-                <h3 class="font-bold text-sm text-textDark leading-tight mb-1 h-10 overflow-hidden">${
-                  p["Nome do Produto"]
-                }</h3>
-                <div class="mt-auto">
-                    <p class="text-xs font-bold ${
-                      estoqueReal > 0 ? "text-green-600" : "text-red-500"
-                    } mb-1">${
-      isEsgotado ? "Item Indisponível" : "Em estoque: " + estoqueReal
-    }</p>
-                    <p class="text-lg font-black text-primary mb-3">R$ ${p[
-                      "Preço"
-                    ]
-                      .toFixed(2)
-                      .replace(".", ",")}</p>
-                    <button onclick="${clickAction}" ${
-      isEsgotado ? "disabled" : ""
-    } class="w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition ${
-      isEsgotado
-        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-        : "bg-primary text-white hover:bg-accent hover:shadow-md"
-    }">${btnText}</button>
-                </div>
-            </div>`;
+    // Localize este trecho dentro de renderProducts:
+
+const card = document.createElement("div");
+card.className = "bg-white rounded-3xl overflow-hidden border border-slate-100 group hover:shadow-xl transition-all duration-300 flex flex-col h-full relative";
+
+card.innerHTML = `
+    <div class="relative aspect-[4/5] bg-slate-50 overflow-hidden">
+        <img src="${driveImg(p["Imagem"])}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500 ${isEsgotado ? "grayscale opacity-50" : ""}">
+        
+        ${isEsgotado 
+            ? '<div class="absolute inset-0 flex items-center justify-center font-black text-red-500 uppercase tracking-widest text-sm bg-white/40 backdrop-blur-[2px]">Esgotado</div>' 
+            : isUltimasUnidades 
+            ? '<div class="absolute bottom-3 right-3 bg-orange-500 text-white text-[9px] font-black px-2 py-1 rounded-lg shadow-lg animate-pulse uppercase z-10">Últimas Unidades</div>'
+            : ""
+        }
+    </div>
+    <div class="p-4 flex flex-col flex-1">
+        <span class="text-[10px] font-bold text-accent uppercase tracking-tighter mb-1">${p["Categoria"]}</span>
+        <h3 class="font-bold text-sm text-textDark leading-tight mb-1 h-10 overflow-hidden">${p["Nome do Produto"]}</h3>
+        <div class="mt-auto">
+            <p class="text-xs font-bold ${isEsgotado ? "text-red-500" : isUltimasUnidades ? "text-orange-500" : "text-green-600"} mb-1">
+                ${isEsgotado ? "Indisponível" : isUltimasUnidades ? `Corra! Apenas ${estoqueReal} em estoque` : "Em estoque: " + estoqueReal}
+            </p>
+            <p class="text-lg font-black text-primary mb-3">R$ ${p["Preço"].toFixed(2).replace(".", ",")}</p>
+            <button onclick="${clickAction}" ${isEsgotado ? "disabled" : ""} 
+                class="w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition ${
+                    isEsgotado ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-primary text-white hover:bg-accent hover:shadow-md"
+                }">${btnText}</button>
+        </div>
+    </div>`;
+
     productsContainer.appendChild(card);
   });
 }
 
 // --- FUNÇÃO PARA ADICIONAR AO CARRINHO ---
 function addToCart(id, name, price, img) {
-  // Verifica se o item já existe no carrinho
-  const existingItem = cart.find((item) => item.id === id);
+  // 1. Encontrar o saldo original do produto (pegamos apenas a parte numérica do ID antes do hífen)
+  const baseId = id.toString().split("-")[0];
+  const originalProduct = allProducts.find(p => p["ID"].toString() === baseId);
+  const estoqueDisponivel = originalProduct ? parseInt(originalProduct["Saldo Estoque"]) : 0;
 
-  if (existingItem) {
-    // Se já existe, apenas aumenta a quantidade
-    existingItem.quantity += 1;
-  } else {
-    // Se é novo, adiciona o objeto ao array
-    cart.push({
-      id: id,
-      name: name,
-      price: price,
-      img: img,
-      quantity: 1,
-    });
+  // 2. Verificar quanto já existe desse item no carrinho
+  const existingItem = cart.find((item) => item.id === id);
+  const quantidadeNoCarrinho = existingItem ? existingItem.quantity : 0;
+
+  // 3. Validar se pode adicionar mais um
+  if (quantidadeNoCarrinho >= estoqueDisponivel) {
+    Toastify({
+      text: `Ops! Temos apenas ${estoqueDisponivel} unidade(s) em estoque.`,
+      duration: 3000,
+      gravity: "bottom",
+      position: "right",
+      style: { background: "#ef4444", borderRadius: "12px" },
+    }).showToast();
+    return; // Interrompe a função aqui
   }
 
-  // Mostra um aviso visual que o produto foi adicionado
+  if (existingItem) {
+    existingItem.quantity += 1;
+  } else {
+    cart.push({ id, name, price, img, quantity: 1 });
+  }
+
   Toastify({
     text: `${name} adicionado à sacola!`,
     duration: 2000,
     gravity: "bottom",
     position: "right",
-    style: {
-      background: "#8e5fb1",
-      borderRadius: "12px",
-      fontSize: "12px",
-    },
+    style: { background: "#8e5fb1", borderRadius: "12px" },
   }).showToast();
 
-  // Atualiza o visual do carrinho e o contador do topo
   updateCart();
 }
 
@@ -379,25 +389,34 @@ if (freteEl)
 
 cartTotal.innerText = `R$ ${totalGeral.toFixed(2).replace(".", ",")}`;
 
-const clearCartBtn = document.getElementById("clear-cart-btn");
-cart.length === 0
-  ? clearCartBtn.classList.add("hidden")
-  : clearCartBtn.classList.remove("hidden");
-
-// ... (outras funções do carrinho)
+// ..(Função para o botão -ou + dentro do carrinho)
 
 function changeQty(id, delta) {
   const item = cart.find((i) => i.id === id);
-  if (item) {
-    item.quantity += delta;
-    if (item.quantity <= 0) cart = cart.filter((i) => i.id !== id);
-  }
-  updateCart();
-}
+  if (!item) return;
 
-// REMOVE ITENS
-function removeItem(id) {
-  cart = cart.filter((item) => item.id !== id);
+  if (delta > 0) {
+    // Validar estoque ao tentar aumentar a quantidade
+    const baseId = id.toString().split("-")[0];
+    const originalProduct = allProducts.find(p => p["ID"].toString() === baseId);
+    const estoqueDisponivel = originalProduct ? parseInt(originalProduct["Saldo Estoque"]) : 0;
+
+    if (item.quantity >= estoqueDisponivel) {
+      Toastify({
+        text: "Limite de estoque atingido!",
+        duration: 2000,
+        style: { background: "#fbbf24", color: "#000" },
+      }).showToast();
+      return;
+    }
+    item.quantity += 1;
+  } else {
+    // Diminuir quantidade
+    item.quantity -= 1;
+    if (item.quantity <= 0) {
+      cart = cart.filter((i) => i.id !== id);
+    }
+  }
   updateCart();
 }
 
