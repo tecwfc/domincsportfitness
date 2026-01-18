@@ -13,9 +13,9 @@ const FRETE_GRATIS_VALOR = 200.0;
 const TAXA_FRETE = 10.0;
 
 const PRODUCTS_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vS81c2V8WFE0NbViXmuT-5k2kv78BUDgIT_nY7wDjOVYN078GJmpBlo_3SUrntbu0g72I0AV37-NnYF/pub?gid=1588150896&single=true&output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuuzpDaHKqdCXHIzK4tqd1puYIODk_NDWw3awJ_qOo_PQ0IhLChBN3BlKq9LgBUPoXciLcMuNygE-P/pub?gid=1588150896&single=true&output=csv";
 const BANNERS_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vS81c2V8WFE0NbViXmuT-5k2kv78BUDgIT_nY7wDjOVYN078GJmpBlo_3SUrntbu0g72I0AV37-NnYF/pub?gid=2088601138&single=true&output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuuzpDaHKqdCXHIzK4tqd1puYIODk_NDWw3awJ_qOo_PQ0IhLChBN3BlKq9LgBUPoXciLcMuNygE-P/pub?gid=2088601138&single=true&output=csv";
 const ESTOQUE_API_URL =
   "https://script.google.com/macros/s/AKfycbyPYMCLYiUi8TRsC0KYd1amFtezDYTwxtAajZsi5kiEV5vQTWOHK6IFbg1jpz3lX9K8/exec";
 
