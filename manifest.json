@@ -1,0 +1,16 @@
+{
+  "name": "Dominc Sport Fitness",
+  "short_name": "Dominc",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8e5fb1",
+  "icons": [
+    {
+      "src": "assets/logo_dominc.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
