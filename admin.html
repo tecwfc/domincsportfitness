@@ -4,38 +4,188 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dominc Admin | Gestão Premium</title>
+  <title>Dominc Admin | Gestão Enterprise</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap"
     rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
   <style>
     :root {
       --primary: #8e5fb1;
       --primary-dark: #6a3d8b;
       --accent: #d4a5ff;
       --bg: #0b0612;
-      --glass: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
       --text: #ffffff;
       --gray: #94a3b8;
       --error: #ff4d4d;
+      --warning: #f59e0b;
+      --success: #4ade80;
+      --sidebar-w: 240px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
       font-family: "Plus Jakarta Sans", sans-serif;
       background: var(--bg);
-      background-image: radial-gradient(circle at 10% 20%, rgba(142, 95, 177, 0.15), transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(212, 165, 255, 0.1), transparent 40%);
       color: var(--text);
-      margin: 0;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
-      align-items: center;
       overflow-x: hidden;
     }
 
-    /* NOVO LOGIN OVERLAY PREMIUM */
+    aside {
+      width: var(--sidebar-w);
+      background: rgba(0, 0, 0, 0.4);
+      border-right: 1px solid var(--border);
+      height: 100vh;
+      position: fixed;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .nav-link {
+      padding: 14px 18px;
+      border-radius: 12px;
+      color: var(--gray);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: 0.3s;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      color: var(--accent);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-link.active {
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(142, 95, 177, 0.3);
+    }
+
+    main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      padding: 40px;
+    }
+
+    .page-content {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .page-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 30px;
+      border-radius: 24px;
+      margin-bottom: 30px;
+    }
+
+    .grid-dynamic {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 10px 0 5px 2px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: white;
+      outline: none;
+    }
+
+    .btn-main {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(142, 95, 177, 0.4);
+    }
+
+    .btn-main:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      filter: grayscale(0.5);
+    }
+
+    .item-gestao {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .badge-alert {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
     #login-overlay {
       position: fixed;
       inset: 0;
@@ -44,597 +194,500 @@
       justify-content: center;
       align-items: center;
       z-index: 10000;
-      transition: transform 0.8s cubic-bezier(0.87, 0, 0.13, 1), opacity 0.5s;
     }
 
     .login-box {
-      background: rgba(255, 255, 255, 0.02);
+      background: var(--card-bg);
       backdrop-filter: blur(40px);
-      border: 1px solid var(--glass-border);
-      padding: 50px 40px;
+      border: 1px solid var(--border);
+      padding: 40px;
       border-radius: 40px;
       text-align: center;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-      animation: fadeInScale 0.6s ease-out;
-    }
-
-    @keyframes fadeInScale {
-      from {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .logo-wrapper {
-      position: relative;
-      width: 130px;
-      height: 130px;
-      margin: 0 auto 40px;
-    }
-
-    .logo-container {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      z-index: 2;
-      border: 2px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 0 30px rgba(142, 95, 177, 0.3);
-    }
-
-    /* Efeito de brilho girando atrás do logo */
-    .logo-wrapper::after {
-      content: '';
-      position: absolute;
-      inset: -5px;
-      border-radius: 50%;
-      background: conic-gradient(from 0deg, transparent, var(--primary), transparent);
-      animation: rotate 3s linear infinite;
-      z-index: 1;
-    }
-
-    @keyframes rotate {
-      from {
-        transform: rotate(0deg);
-      }
-
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .logo-container img {
-      width: 65%;
-      height: auto;
-      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-    }
-
-    .login-box h2 {
-      font-weight: 800;
-      letter-spacing: 5px;
-      margin-bottom: 5px;
-      background: linear-gradient(to right, #fff, var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .shake {
-      animation: shake 0.4s ease-in-out;
-    }
-
-    @keyframes shake {
-
-      0%,
-      100% {
-        transform: translateX(0);
-      }
-
-      25% {
-        transform: translateX(-10px);
-      }
-
-      75% {
-        transform: translateX(10px);
-      }
-    }
-
-    /* ADMIN CONTENT ESTILOS */
-    #admin-content {
-      display: none;
-      width: 95%;
-      max-width: 700px;
-      background: var(--glass);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      padding: 45px;
-      border-radius: 40px;
-      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
-      margin: 20px 0;
-    }
-
-    .input-wrapper i {
-      position: absolute;
-      left: 18px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--primary);
-      opacity: 0.8;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 16px 20px 16px 48px;
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
-      font-family: inherit;
-      box-sizing: border-box;
-      transition: 0.3s;
-    }
-
-    input:focus,
-    select:focus {
-      outline: none;
-      background: rgba(255, 255, 255, 0.08);
-      border-color: var(--primary);
-      box-shadow: 0 0 20px rgba(142, 95, 177, 0.2);
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .btn-save {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      border: none;
-      padding: 20px;
-      width: 100%;
-      border-radius: 20px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      cursor: pointer;
-      transition: 0.4s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-save::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: 0.5s;
-    }
-
-    .btn-save:hover::before {
-      left: 100%;
-    }
-
-    .btn-save:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(142, 95, 177, 0.4);
-    }
-
-    .form-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .form-header i {
-      font-size: 2.8rem;
-      color: var(--accent);
-      text-shadow: 0 0 20px rgba(212, 165, 255, 0.5);
-    }
-
-    label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 10px;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--accent);
-    }
-
-    .form-group {
-      margin-bottom: 25px;
-    }
-
-    .upload-area {
-      border: 2px dashed var(--glass-border);
-      padding: 30px;
-      border-radius: 25px;
-      text-align: center;
-      cursor: pointer;
-      background: rgba(255, 255, 255, 0.01);
-      transition: 0.3s;
-    }
-
-    .upload-area:hover {
-      background: rgba(255, 255, 255, 0.03);
-      border-color: var(--primary);
-    }
-
-    #status-msg {
-      text-align: center;
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 15px;
-      display: none;
-      border: 1px solid transparent;
-    }
-
-    @media (max-width: 600px) {
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
-
-      .login-box {
-        padding: 40px 25px;
-      }
+      width: 320px;
     }
   </style>
 </head>
 
 <body>
+
   <div id="login-overlay">
-    <div class="login-box" id="loginCard">
-      <div class="logo-wrapper">
-        <div class="logo-container">
-          <img src="assets/logo_dominc_fitness.png" alt="Logo"
-            onerror="this.src='https://cdn-icons-png.flaticon.com/512/8018/8018979.png'" />
-        </div>
-      </div>
-      <h2>DOMINC</h2>
-      <p style="color: var(--gray); font-size: 0.75rem; margin-bottom: 35px; letter-spacing: 3px; font-weight: 600;">
-        PORTAL ADMINISTRATIVO</p>
-
-      <div class="input-wrapper" style="margin-bottom: 25px">
-        <i class="fas fa-shield-halved"></i>
-        <input type="password" id="admin-pass" placeholder="SENHA DE ACESSO"
-          style="padding-left: 48px; text-align: center; letter-spacing: 5px" onkeypress="handleEnter(event)" />
-      </div>
-
-      <button class="btn-save" onclick="checkPass()">
-        <i class="fas fa-unlock-alt" style="margin-right: 10px;"></i> ENTRAR NO PAINEL
-      </button>
+    <div class="login-box">
+      <h2 style="letter-spacing: 3px; margin-bottom: 20px;">DOMINC</h2>
+      <input type="password" id="admin-pass" placeholder="SENHA"
+        style="text-align: center; letter-spacing: 5px; margin-bottom: 20px;" />
+      <button id="btnLogin" class="btn-main" style="width: 100%;" onclick="checkPass()">ENTRAR</button>
     </div>
   </div>
 
-  <div id="admin-content">
-    <div class="form-header">
-      <i class="fas fa-gem"></i>
-      <h2 style="letter-spacing: 2px; margin-top: 10px">Cadastro de Produtos</h2>
+  <aside id="sidebar" style="display: none;">
+    <div style="font-weight: 800; color: var(--accent); margin-bottom: 40px; font-size: 1.4rem; text-align: center;">
+      DOMINC</div>
+    <div class="nav-link active" onclick="showPage('page-cadastros', this)"><i class="fas fa-plus-circle"></i>
+      <span>Cadastros</span></div>
+    <div class="nav-link" onclick="showPage('page-estoque', this)"><i class="fas fa-boxes-stacked"></i>
+      <span>Estoque</span></div>
+    <div class="nav-link" onclick="showPage('page-banners', this)"><i class="fas fa-images"></i> <span>Banners</span>
+    </div>
+    <button onclick="logout()"
+      style="margin-top: auto; background: none; border: none; color: var(--error); cursor: pointer; padding: 15px; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+      <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
+    </button>
+  </aside>
+
+  <main id="admin-content" style="display: none;">
+
+    <div id="page-cadastros" class="page-content active">
+      <div class="section-card">
+        <div style="margin-bottom: 25px;">
+          <h2><i class="fas fa-plus-circle"></i> Novo Produto</h2>
+        </div>
+        <form id="productForm">
+          <div class="grid-dynamic">
+            <div><label>Nome</label><input type="text" id="nome" required></div>
+            <div><label>Categoria</label>
+              <select id="categoria">
+                <option value="Garrafas">Garrafas</option>
+                <option value="feminino">Feminino</option>
+                <option value="masculino">Masculino</option>
+                <option value="Acessórios">Acessórios</option>
+              </select>
+            </div>
+            <div><label>ML</label><input type="text" id="ml" placeholder="ex: 500ml"></div>
+            <div><label>Preço</label><input type="number" step="0.01" id="preco" required></div>
+            <div><label>Cores</label><input type="text" id="cores" placeholder="Azul, Rosa"></div>
+            <div><label>Tamanhos</label><input type="text" id="tamanho" placeholder="P, M, G"></div>
+            <div><label>Estoque Inicial</label><input type="number" id="estoque" required></div>
+            <div><label>Disponível</label><select id="disponivel">
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select></div>
+            <div><label>Destaque</label><select id="destaque">
+                <option value="não">Não</option>
+                <option value="sim">Sim</option>
+              </select></div>
+          </div>
+          <label>URL Imagem</label><input type="url" id="imagem">
+          <button type="submit" class="btn-main" id="btnPubProd" style="width: 100%; margin-top: 25px;">PUBLICAR
+            PRODUTO</button>
+        </form>
+      </div>
+
+      <div class="section-card">
+        <div style="margin-bottom: 25px;">
+          <h2><i class="fas fa-image"></i> Novo Banner</h2>
+        </div>
+        <form id="bannerForm">
+          <div class="grid-dynamic">
+            <div><label>URL Imagem</label><input type="text" id="b-imagem" required></div>
+            <div><label>Título</label><input type="text" id="b-titulo"></div>
+            <div><label>Texto Botão</label><input type="text" id="b-btn-texto"></div>
+            <div><label>Link Botão</label><input type="text" id="b-btn-link" placeholder="#produtos"></div>
+          </div>
+          <button type="submit" class="btn-main" id="btnPubBanner" style="width: 100%; margin-top: 25px;">ADICIONAR
+            BANNER</button>
+        </form>
+      </div>
     </div>
 
-    <form id="productForm">
-      <div class="form-group">
-        <label>Nome do Produto</label>
-        <div class="input-wrapper">
-          <i class="fas fa-tag"></i>
-          <input type="text" id="nome" required placeholder="Ex: Garrafa Térmica Diamond Purple" />
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Capacidade / Descrição</label>
-          <div class="input-wrapper"><i class="fas fa-info-circle"></i><input type="text" id="ml"
-              placeholder="Ex: 750ml" /></div>
-        </div>
-        <div class="form-group">
-          <label>Grade de Tamanhos</label>
-          <div class="input-wrapper"><i class="fas fa-ruler-combined"></i><input type="text" id="tamanho"
-              placeholder="Ex: P, M, G" /></div>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Preço (R$)</label>
-          <div class="input-wrapper"><i class="fas fa-dollar-sign"></i><input type="number" step="0.01" id="preco"
-              required /></div>
-        </div>
-        <div class="form-group">
-          <label>Estoque</label>
-          <div class="input-wrapper"><i class="fas fa-boxes-stacked"></i><input type="number" id="estoque" required />
+    <div id="page-estoque" class="page-content">
+      <div class="section-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2><i class="fas fa-boxes-stacked"></i> Gestão de Estoque</h2>
+          <div style="display: flex; gap: 10px;">
+            <button id="btnPdf" onclick="gerarPDF()" class="btn-main"
+              style="background: var(--success); color: #000; padding: 8px 15px; font-size: 11px;"><i
+                class="fas fa-file-pdf"></i> PDF ESTOQUE</button>
+            <button id="btnAtualizar" onclick="carregarDados()" class="btn-main"
+              style="background: var(--card-bg); padding: 8px 15px; font-size: 11px;"><i class="fas fa-sync"></i>
+              ATUALIZAR</button>
           </div>
         </div>
+        <input type="text" id="busca-admin" placeholder="🔍 Pesquisar por nome ou ID..."
+          style="margin-bottom: 25px; background: rgba(255,255,255,0.08);">
+        <div id="lista-gestao">Carregando estoque...</div>
       </div>
+    </div>
 
-
-      <div class="form-group">
-        <label>Categoria</label>
-        <div class="input-wrapper">
-          <i class="fas fa-list-ul"></i>
-          <select id="categoria" onchange="toggleGrade()">
-            <option value="Garrafas">Garrafas Térmicas</option>
-            <option value="Roupas">Roupas Fitness</option>
-            <option value="Acessórios">Acessórios</option>
-          </select>
+    <div id="page-banners" class="page-content">
+      <div class="section-card">
+        <div style="margin-bottom: 25px;">
+          <h2><i class="fas fa-images"></i> Gestão de Banners</h2>
         </div>
+        <div id="lista-banners"></div>
       </div>
-
-      <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-        <i class="fas fa-cloud-arrow-up" style="font-size: 2rem; color: var(--accent); margin-bottom: 15px"></i>
-        <p id="file-name" style="margin: 0; font-weight: 600">IMAGEM DO PRODUTO (Upload)</p>
-        <input type="file" id="fileInput" accept="image/*" style="display: none" />
-      </div>
-
-      <div class="form-group" style="margin-top:20px">
-        <label>Ou Link da Imagem</label>
-        <div class="input-wrapper"><i class="fas fa-link"></i><input type="url" id="imagemLink" /></div>
-      </div>
-
-      <div class="form-group">
-        <label>Selo de Exclusividade</label>
-        <div class="input-wrapper">
-          <i class="fas fa-certificate"></i>
-          <select id="destaque">
-            <option value="não">Nenhum Selo</option>
-            <option value="sim">Destaque VIP</option>
-            <option value="lançamento">Novo Lançamento</option>
-          </select>
-        </div>
-      </div>
-
-      <button type="submit" class="btn-save" id="submitBtn">
-        <i class="fas fa-paper-plane" style="margin-right: 10px"></i> FINALIZAR E PUBLICAR
-      </button>
-    </form>
-    <div id="status-msg"></div>
-
-
-
-    <!-- banner -->
-    <div class="form-header" style="margin-top: 50px; border-top: 1px solid var(--glass-border); pt-40px">
-      <i class="fas fa-images"></i>
-      <h2 style="letter-spacing: 2px; margin-top: 10px">Gestão de Banners (Swiper)</h2>
     </div>
 
-    <form id="bannerForm">
+  </main>
 
-  <div class="form-group">
-    <label>Link da Imagem (Drive)</label>
-    <div class="input-wrapper">
-      <i class="fas fa-link"></i>
-      <input type="url" id="b-img" required
-        placeholder="https://drive.google.com/file/d/..." />
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label>Título</label>
-    <div class="input-wrapper">
-      <i class="fas fa-font"></i>
-      <input type="text" id="b-tit" required />
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label>Texto do Botão</label>
-    <input type="text" id="b-txtbtn" required />
-  </div>
-
- <div class="form-group">
-  <label>Link do Botão</label>
-  <input
-    type="text"
-    id="b-link"
-    value="#produtos"
-    required/>
-</div>
-
-  <button type="submit" class="btn-save" id="bannerBtn">
-    <i class="fas fa-sync"></i> SALVAR BANNER
-  </button>
-
-</form>
-
-    <!-- Fim do banner -->
-     
-  </div>
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby80SObBko8QKxB1NgL0y0JTTHmJStLvn0uDskBH9X9y6itNu5EvuUTTApAGlMhzP61/exec";
-   
+    
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOy9ngHSvcY_LkngnJwgXu9bzzGJZhZM_0-LwRfF5q-eGuMHOrySLmON3M_swCPxXhxg/exec";
+    let dadosLocais = { produtos: [], banners: [] };
 
-    // LOGIN FUNCTIONS
-    function handleEnter(e) {
-      if (e.key === "Enter") checkPass();
+    function setBtnLoading(btn, isLoading, originalText) {
+        if (!btn) return;
+        if (isLoading) {
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> PROCESSANDO...`;
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
     }
 
-  function checkPass() {
-  const pass = document.getElementById("admin-pass").value;
-  const loginCard = document.getElementById("loginCard");
-
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      tipo: "login",
-      senha: pass
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.auth === true) {
-      document.getElementById("login-overlay").style.opacity = "0";
-      setTimeout(() => {
-        document.getElementById("login-overlay").style.display = "none";
-        document.getElementById("admin-content").style.display = "block";
-      }, 500);
-    } else {
-      erroLogin();
+    function showPage(pageId, element) {
+        document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        element.classList.add('active');
     }
-  })
-  .catch(() => erroLogin());
-}
 
-function erroLogin() {
-  const input = document.getElementById("admin-pass");
-  const loginCard = document.getElementById("loginCard");
+    function fixImgUrl(url) {
+        if (!url || !url.includes('drive.google.com')) return url;
+        let id = "";
+        if (url.includes('id=')) {
+            id = url.split('id=')[1].split('&')[0];
+        } else {
+            const parts = url.split('/');
+            id = parts[parts.indexOf('d') + 1];
+        }
+        return `https://docs.google.com/uc?export=view&id=${id}`;
+    }
 
-  loginCard.classList.add("shake");
-  input.value = "";
-  input.style.borderColor = "var(--error)";
-  setTimeout(() => loginCard.classList.remove("shake"), 400);
-}
+    async function checkPass() {
+        const btn = document.getElementById("btnLogin");
+        const original = btn.innerHTML;
+        setBtnLoading(btn, true);
+        const pass = document.getElementById("admin-pass").value;
+        try {
+            const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ tipo: "login", senha: pass }) });
+            const data = await res.json();
+            if (data.auth) { 
+                localStorage.setItem("dominc_logado", "true"); 
+                location.reload(); 
+            } else { 
+                alert("Senha incorreta"); 
+                setBtnLoading(btn, false, original); 
+            }
+        } catch (e) { 
+            alert("Erro de conexão"); 
+            setBtnLoading(btn, false, original); 
+        }
+    }
 
-/* =======================
-   FUNÇÕES DE PRODUTO
-======================= */
-
-function limparParaBusca(texto) {
-  return texto.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-}
-
-function toggleGrade() {
-  const cat = document.getElementById("categoria").value;
-  document.getElementById("tamanho").style.opacity = (cat !== "Roupas") ? "0.5" : "1";
-}
-
-document.getElementById("fileInput").addEventListener("change", function (e) {
-  document.getElementById("file-name").innerText =
-    "Selecionado: " + (e.target.files[0]?.name || "");
-});
-
-const processImg = (file) => new Promise((res) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = (e) => {
-    const img = new Image();
-    img.src = e.target.result;
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const scale = 800 / img.width;
-      canvas.width = 800;
-      canvas.height = img.height * scale;
-      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-      res(canvas.toDataURL("image/jpeg", 0.8));
+    window.onload = () => {
+        if (localStorage.getItem("dominc_logado") === "true") {
+            document.getElementById("login-overlay").style.display = "none";
+            document.getElementById("admin-content").style.display = "block";
+            document.getElementById("sidebar").style.display = "flex";
+            carregarDados();
+        }
     };
-  };
-});
 
-/* =======================
-   ENVIO DE PRODUTOS
-======================= */
+    function logout() { localStorage.removeItem("dominc_logado"); location.reload(); }
 
-document.getElementById("productForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+    async function carregarDados() {
+        const btn = document.getElementById("btnAtualizar");
+        const original = btn ? btn.innerHTML : "";
+        if (btn) setBtnLoading(btn, true);
 
-  const btn = document.getElementById("submitBtn");
-  const msg = document.getElementById("status-msg");
+        try {
+            const res = await fetch(SCRIPT_URL);
+            const data = await res.json();
+            dadosLocais = data;
 
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PUBLICANDO...';
+            const pCont = document.getElementById("lista-gestao");
+            pCont.innerHTML = "";
+            
+            // Filtramos para mostrar apenas quem tem saldo > 0
+            const produtosAtivos = data.produtos.filter(p => (parseInt(p.estoque) || 0) > 0);
 
-  let finalImg = document.getElementById("imagemLink").value;
-  if (document.getElementById("fileInput").files.length > 0) {
-    finalImg = await processImg(document.getElementById("fileInput").files[0]);
-  }
+            if (produtosAtivos.length === 0) {
+                pCont.innerHTML = "<p style='text-align:center; color:var(--gray);'>Nenhum produto com estoque disponível.</p>";
+            }
 
-  const payload = {
-  tipo: "produto", // 🔥 ESSENCIAL
+            produtosAtivos.forEach(p => {
+                let estoqueColor = "white";
+                let alertBadge = "";
+                const estoqueNum = parseInt(p.estoque) || 0;
 
-  nome: document.getElementById("nome").value,
-  ml: document.getElementById("ml").value,
-  preco: document.getElementById("preco").value,
-  categoria: document.getElementById("categoria").value,
-  tamanho: document.getElementById("tamanho").value,
-  imagem: finalImg,
+                // Como filtramos acima, aqui ele só entrará se for > 0
+                if (estoqueNum < 5) {
+                    estoqueColor = "var(--warning)";
+                    alertBadge = `<span class="badge-alert" style="background:var(--warning); color:black;">Estoque Baixo</span>`;
+                }
 
-  disponivel: "sim",
-  destaque: document.getElementById("destaque").value,
-  estoque: document.getElementById("estoque").value,
+                const card = document.createElement("div");
+                card.className = "item-gestao";
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <div><span class="badge-alert" style="background:var(--accent); color:black; margin-right:10px;">ID: ${p.id}</span> ${alertBadge}</div>
+                        <button onclick="excluirProd('${p.id}', this)" style="background:none; border:none; color:var(--error); cursor:pointer;"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                        <div style="flex:1; min-width:100px; text-align:center;">
+                            <img src="${fixImgUrl(p.imagem)}" style="width:100px; height:100px; border-radius:12px; object-fit:cover;">
+                            <input type="text" id="img-${p.id}" value="${p.imagem}" style="font-size:8px; margin-top:5px;">
+                        </div>
+                        <div class="grid-dynamic" style="flex:4;">
+                            <div><label>Nome</label><input type="text" id="n-${p.id}" value="${p.nome}"></div>
+                            <div><label>Preço</label><input type="number" id="p-${p.id}" value="${p.preco}"></div>
+                            <div><label style="color:${estoqueColor}">Estoque Atual</label><input type="number" id="e-${p.id}" value="${p.estoque}"></div>
+                            <div><label>Categoria</label><input type="text" id="c-${p.id}" value="${p.categoria}"></div>
+                            <div><label>ML</label><input type="text" id="m-${p.id}" value="${p.ml}"></div>
+                            <div><label>Cores</label><input type="text" id="co-${p.id}" value="${p.cores}"></div>
+                            <div><label>Tamanho</label><input type="text" id="t-${p.id}" value="${p.tamanho}"></div>
+                            <div><label>Disp.</label><input type="text" id="d-${p.id}" value="${p.disponivel}"></div>
+                            <div><label>Destaque</label>
+                                <select id="dest-${p.id}">
+                                    <option value="não" ${p.destaque === 'não' ? 'selected' : ''}>Não</option>
+                                    <option value="sim" ${p.destaque === 'sim' ? 'selected' : ''}>Sim</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-main" style="width:100%; margin-top:15px; background:var(--success); color:#000;" onclick="salvarProd('${p.id}', this)">SALVAR ALTERAÇÕES</button>
+                `;
+                pCont.appendChild(card);
+            });
 
- 
-};
+            // ... (resto do código dos banners permanece igual)
 
+            const bCont = document.getElementById("lista-banners");
+            bCont.innerHTML = "";
+            data.banners.forEach(b => {
+                const bDiv = document.createElement("div");
+                bDiv.className = "item-gestao";
+                bDiv.innerHTML = `
+                    <div class="grid-dynamic">
+                        <div style="text-align:center;"><img src="${fixImgUrl(b.imagem)}" style="width:100%; height:80px; object-fit:cover; border-radius:10px;"><input type="text" id="bi-${b.id_linha}" value="${b.imagem}" style="font-size:8px; margin-top:5px;"></div>
+                        <div><label>Título</label><input type="text" id="bt-${b.id_linha}" value="${b.titulo}"></div>
+                        <div><label>Botão Texto</label><input type="text" id="btxt-${b.id_linha}" value="${b.textoBtn}"></div>
+                        <div><label>Link Botão</label><input type="text" id="bl-${b.id_linha}" value="${b.linkBtn}"></div>
+                        <div><label>Ativo?</label><select id="ba-${b.id_linha}"><option value="sim" ${b.ativo == 'sim' ? 'selected' : ''}>Sim</option><option value="não" ${b.ativo == 'não' ? 'selected' : ''}>Não</option></select></div>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-main" style="flex:1" onclick="salvarBanner(${b.id_linha}, this)">SALVAR BANNER</button><button onclick="excluirBanner(${b.id_linha}, this)" style="color:var(--error); background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i></button></div>
+                `;
+                bCont.appendChild(bDiv);
+            });
+        } catch (e) { console.error(e); }
+        finally { if (btn) setBtnLoading(btn, false, original); }
+    }
 
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    body: JSON.stringify(payload)
-  })
-    .then(res => res.json())
-    .then(() => {
-      msg.style.display = "block";
-      msg.style.background = "rgba(74, 222, 128, 0.1)";
-      msg.style.borderColor = "#4ade80";
-      msg.style.color = "#4ade80";
-      msg.innerHTML = "✨ PRODUTO CADASTRADO COM SUCESSO!";
-      document.getElementById("productForm").reset();
-    })
-    .catch(() => {
-      msg.style.display = "block";
-      msg.style.color = "#f87171";
-      msg.innerText = "❌ Erro ao enviar produto.";
-    })
-    .finally(() => {
-      btn.disabled = false;
-      btn.innerHTML =
-        '<i class="fas fa-paper-plane" style="margin-right: 10px;"></i> FINALIZAR E PUBLICAR';
+    // FORMULÁRIO DE PRODUTO (UNIFICADO E CORRIGIDO)
+    document.getElementById("productForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("btnPubProd");
+        const original = btn.innerHTML;
+        setBtnLoading(btn, true);
+
+        const payload = {
+            tipo: "produto",
+            nome: document.getElementById("nome").value,
+            ml: document.getElementById("ml").value,
+            preco: document.getElementById("preco").value,
+            categoria: document.getElementById("categoria").value,
+            cores: document.getElementById("cores").value,
+            tamanho: document.getElementById("tamanho").value,
+            imagem: document.getElementById("imagem").value,
+            disponivel: document.getElementById("disponivel").value,
+            destaque: document.getElementById("destaque").value,
+            estoque: document.getElementById("estoque").value
+        };
+
+        try {
+            await fetch(SCRIPT_URL, { 
+                method: "POST", 
+                mode: "no-cors", 
+                body: JSON.stringify(payload) 
+            });
+            alert("Produto enviado com sucesso!");
+            e.target.reset();
+            setTimeout(carregarDados, 2000);
+        } catch (err) {
+            alert("Erro ao enviar produto.");
+        } finally {
+            setBtnLoading(btn, false, original);
+        }
+    };
+
+    // FORMULÁRIO DE BANNER
+    document.getElementById("bannerForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("btnPubBanner");
+        const original = btn.innerHTML;
+        setBtnLoading(btn, true);
+
+        const payload = {
+            tipo: "banner",
+            imagem: document.getElementById("b-imagem").value,
+            titulo: document.getElementById("b-titulo").value,
+            botaoTexto: document.getElementById("b-btn-texto").value,
+            botaoLink: document.getElementById("b-btn-link").value,
+            ativo: "sim"
+        };
+
+        try {
+            await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
+            alert("Banner Adicionado!");
+            e.target.reset();
+            setTimeout(carregarDados, 2000);
+        } catch (err) {
+            alert("Erro ao adicionar banner.");
+        } finally {
+            setBtnLoading(btn, false, original);
+        }
+    };
+
+    async function salvarProd(id, btn) {
+        const original = btn.innerHTML; setBtnLoading(btn, true);
+        const payload = {
+            tipo: "editar_produto",
+            id: id,
+            nome: document.getElementById(`n-${id}`).value,
+            ml: document.getElementById(`m-${id}`).value,
+            preco: document.getElementById(`p-${id}`).value,
+            categoria: document.getElementById(`c-${id}`).value,
+            cores: document.getElementById(`co-${id}`).value,
+            tamanho: document.getElementById(`t-${id}`).value,
+            imagem: document.getElementById(`img-${id}`).value,
+            disponivel: document.getElementById(`d-${id}`).value,
+            estoque: document.getElementById(`e-${id}`).value,
+            destaque: document.getElementById(`dest-${id}`).value
+        };
+        try { 
+            await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) }); 
+            alert("Alterações enviadas!"); 
+            setTimeout(carregarDados, 1500);
+        } finally { setBtnLoading(btn, false, original); }
+    }
+
+    async function salvarBanner(linha, btn) {
+        const original = btn.innerHTML; setBtnLoading(btn, true);
+        const payload = { 
+            tipo: "editar_banner", 
+            linha: linha, 
+            imagem: document.getElementById(`bi-${linha}`).value, 
+            titulo: document.getElementById(`bt-${linha}`).value, 
+            botaoTexto: document.getElementById(`btxt-${linha}`).value, 
+            botaoLink: document.getElementById(`bl-${linha}`).value, 
+            ativo: document.getElementById(`ba-${linha}`).value 
+        };
+        try { 
+            await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) }); 
+            alert("Banner atualizado!"); 
+        } finally { setBtnLoading(btn, false, original); }
+    }
+
+    async function excluirProd(id, btn) {
+        if (confirm("Excluir produto?")) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ tipo: "excluir_produto", id: id }) });
+            setTimeout(carregarDados, 1500);
+        }
+    }
+
+    async function excluirBanner(linha, btn) {
+        if (confirm("Excluir banner?")) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ tipo: "excluir_banner", linha: linha }) });
+            setTimeout(carregarDados, 1500);
+        }
+    }
+
+    document.getElementById('busca-admin').addEventListener('input', (e) => {
+        const t = e.target.value.toLowerCase();
+        document.querySelectorAll('#lista-gestao .item-gestao').forEach(card => {
+            card.style.display = card.innerText.toLowerCase().includes(t) ? "block" : "none";
+        });
     });
-});
 
-/* =======================
-   ENVIO DE BANNERS
-======================= */
-document.getElementById("bannerForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+    function gerarPDF() {
+        const btn = document.getElementById("btnPdf");
+        const original = btn.innerHTML;
+        setBtnLoading(btn, true);
 
-  const btn = document.getElementById("bannerBtn");
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SALVANDO...';
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF("l", "mm", "a4");
 
-  const payload = {
-    tipo: "banner",
-    imagem: document.getElementById("b-img").value,
-    titulo: document.getElementById("b-tit").value,
-    botaoTexto: document.getElementById("b-txtbtn").value,
-    botaoLink: document.getElementById("b-link").value
-  };
+        // Variáveis para o cálculo do rodapé
+        let somaTotalDinheiro = 0;
+        let somaTotalProdutos = 0;
 
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
+        doc.setFontSize(18);
+        doc.text("BALANÇO PATRIMONIAL DE ESTOQUE - DOMINC", 14, 15);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Apenas itens com saldo disponível | Gerado em: ${new Date().toLocaleString()}`, 14, 22);
 
-    if (!res.ok) throw new Error();
+        const colunas = [
+            "ID", "Produto", "ML", "Preço Unit.", "Cat.", 
+            "Cores", "Tam.", "Est. Inicial", "Vendidos", "SALDO", "VALOR TOTAL"
+        ];
 
-    alert("✅ Banner salvo com sucesso!");
-    document.getElementById("bannerForm").reset();
+        // Filtro e Mapeamento
+        const linhas = dadosLocais.produtos
+            .filter(p => {
+                const saldo = (parseInt(p.estoque) || 0) - (parseInt(p.vendidos) || 0);
+                return saldo > 0;
+            })
+            .map(p => {
+                const estoque = parseInt(p.estoque) || 0;
+                const vendidos = parseInt(p.vendidos) || 0;
+                const saldo = estoque - vendidos;
+                const precoUnit = parseFloat(p.preco) || 0;
+                const valorNoEstoque = saldo * precoUnit;
 
-  } catch {
-    alert("❌ Erro ao salvar banner.");
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-sync"></i> SALVAR BANNER';
-  }
-});
+                // Acumulando para o rodapé
+                somaTotalDinheiro += valorNoEstoque;
+                somaTotalProdutos += saldo;
 
+                return [
+                    p.id, 
+                    p.nome, 
+                    p.ml || "-", 
+                    `R$ ${precoUnit.toFixed(2)}`, 
+                    p.categoria, 
+                    p.cores || "-", 
+                    p.tamanho || "-", 
+                    estoque,
+                    vendidos,
+                    saldo,
+                    `R$ ${valorNoEstoque.toFixed(2)}`
+                ];
+            });
 
-toggleGrade();
+        doc.autoTable({
+            head: [colunas],
+            body: linhas,
+            startY: 30,
+            theme: 'grid',
+            styles: { fontSize: 7, cellPadding: 2 },
+            headStyles: { fillColor: [142, 95, 177], textColor: [255, 255, 255] },
+            columnStyles: {
+                9: { fontStyle: 'bold' }, // Saldo
+                10: { fontStyle: 'bold', halign: 'right' } // Valor Total
+            },
+            // Adiciona a linha de totais no fim da tabela
+            foot: [[
+                "", "TOTAIS", "", "", "", "", "", "", "", 
+                somaTotalProdutos, 
+                `R$ ${somaTotalDinheiro.toFixed(2)}`
+            ]],
+            footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8 }
+        });
 
-  </script>
+        // Informação visual extra abaixo da tabela
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(11);
+        doc.setTextColor(0);
+        doc.text(`Valor total investido em estoque: R$ ${somaTotalDinheiro.toFixed(2)}`, 14, finalY);
+
+        doc.save("balanco-financeiro-dominc.pdf");
+        setBtnLoading(btn, false, original);
+    }
+</script>
 </body>
+
 </html>
