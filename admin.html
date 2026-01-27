@@ -396,85 +396,88 @@
             const data = await res.json();
             dadosLocais = data;
 
+            // --- RENDERIZAR PRODUTOS (ESTOQUE) ---
             const pCont = document.getElementById("lista-gestao");
             pCont.innerHTML = "";
             
-            // Filtramos para mostrar apenas quem tem saldo > 0
-            const produtosAtivos = data.produtos.filter(p => (parseInt(p.estoque) || 0) > 0);
+            data.produtos.forEach(p => {
+                const estoqueInicial = parseInt(p.estoque) || 0;
+                const vendidos = parseInt(p.vendidos) || 0;
+                const saldoReal = estoqueInicial - vendidos;
 
-            if (produtosAtivos.length === 0) {
-                pCont.innerHTML = "<p style='text-align:center; color:var(--gray);'>Nenhum produto com estoque disponível.</p>";
-            }
-
-            produtosAtivos.forEach(p => {
                 let estoqueColor = "white";
                 let alertBadge = "";
-                const estoqueNum = parseInt(p.estoque) || 0;
-
-                // Como filtramos acima, aqui ele só entrará se for > 0
-                if (estoqueNum < 5) {
+                if (saldoReal < 5 && saldoReal > 0) {
                     estoqueColor = "var(--warning)";
-                    alertBadge = `<span class="badge-alert" style="background:var(--warning); color:black;">Estoque Baixo</span>`;
+                    alertBadge = `<span class="badge-alert" style="background:var(--warning); color:black;">Baixo</span>`;
+                }
+                if (saldoReal <= 0) {
+                    estoqueColor = "var(--error)";
+                    alertBadge = `<span class="badge-alert" style="background:var(--error); color:white;">Esgotado</span>`;
                 }
 
                 const card = document.createElement("div");
                 card.className = "item-gestao";
                 card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <div><span class="badge-alert" style="background:var(--accent); color:black; margin-right:10px;">ID: ${p.id}</span> ${alertBadge}</div>
+                        <div><span class="badge-alert" style="background:var(--accent); color:black;">ID: ${p.id}</span> ${alertBadge}</div>
                         <button onclick="excluirProd('${p.id}', this)" style="background:none; border:none; color:var(--error); cursor:pointer;"><i class="fas fa-trash"></i></button>
                     </div>
                     <div style="display:flex; gap:20px; flex-wrap:wrap;">
                         <div style="flex:1; min-width:100px; text-align:center;">
-                            <img src="${fixImgUrl(p.imagem)}" style="width:100px; height:100px; border-radius:12px; object-fit:cover;">
+                            <img src="${fixImgUrl(p.imagem)}" style="width:80px; height:80px; border-radius:12px; object-fit:cover;">
                             <input type="text" id="img-${p.id}" value="${p.imagem}" style="font-size:8px; margin-top:5px;">
                         </div>
                         <div class="grid-dynamic" style="flex:4;">
                             <div><label>Nome</label><input type="text" id="n-${p.id}" value="${p.nome}"></div>
                             <div><label>Preço</label><input type="number" id="p-${p.id}" value="${p.preco}"></div>
-                            <div><label style="color:${estoqueColor}">Estoque Atual</label><input type="number" id="e-${p.id}" value="${p.estoque}"></div>
+                            <div><label style="color:var(--accent)">Estoque Inicial (K)</label><input type="number" id="e-${p.id}" value="${estoqueInicial}"></div>
+                            <div><label>Vendas (L)</label><input type="number" value="${vendidos}" disabled style="opacity:0.5;"></div>
+                            <div><label style="color:${estoqueColor}">Saldo Atual</label><div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; font-weight:bold;">${saldoReal}</div></div>
                             <div><label>Categoria</label><input type="text" id="c-${p.id}" value="${p.categoria}"></div>
-                            <div><label>ML</label><input type="text" id="m-${p.id}" value="${p.ml}"></div>
-                            <div><label>Cores</label><input type="text" id="co-${p.id}" value="${p.cores}"></div>
-                            <div><label>Tamanho</label><input type="text" id="t-${p.id}" value="${p.tamanho}"></div>
-                            <div><label>Disp.</label><input type="text" id="d-${p.id}" value="${p.disponivel}"></div>
-                            <div><label>Destaque</label>
-                                <select id="dest-${p.id}">
-                                    <option value="não" ${p.destaque === 'não' ? 'selected' : ''}>Não</option>
-                                    <option value="sim" ${p.destaque === 'sim' ? 'selected' : ''}>Sim</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
-                    <button class="btn-main" style="width:100%; margin-top:15px; background:var(--success); color:#000;" onclick="salvarProd('${p.id}', this)">SALVAR ALTERAÇÕES</button>
+                    <button class="btn-main" style="width:100%; margin-top:10px; background:var(--success); color:#000;" onclick="salvarProd('${p.id}', this)">SALVAR PRODUTO</button>
                 `;
                 pCont.appendChild(card);
             });
 
-            // ... (resto do código dos banners permanece igual)
-
+            // --- RENDERIZAR BANNERS (O QUE ESTAVA FALTANDO) ---
             const bCont = document.getElementById("lista-banners");
             bCont.innerHTML = "";
-            data.banners.forEach(b => {
-                const bDiv = document.createElement("div");
-                bDiv.className = "item-gestao";
-                bDiv.innerHTML = `
-                    <div class="grid-dynamic">
-                        <div style="text-align:center;"><img src="${fixImgUrl(b.imagem)}" style="width:100%; height:80px; object-fit:cover; border-radius:10px;"><input type="text" id="bi-${b.id_linha}" value="${b.imagem}" style="font-size:8px; margin-top:5px;"></div>
-                        <div><label>Título</label><input type="text" id="bt-${b.id_linha}" value="${b.titulo}"></div>
-                        <div><label>Botão Texto</label><input type="text" id="btxt-${b.id_linha}" value="${b.textoBtn}"></div>
-                        <div><label>Link Botão</label><input type="text" id="bl-${b.id_linha}" value="${b.linkBtn}"></div>
-                        <div><label>Ativo?</label><select id="ba-${b.id_linha}"><option value="sim" ${b.ativo == 'sim' ? 'selected' : ''}>Sim</option><option value="não" ${b.ativo == 'não' ? 'selected' : ''}>Não</option></select></div>
-                    </div>
-                    <div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-main" style="flex:1" onclick="salvarBanner(${b.id_linha}, this)">SALVAR BANNER</button><button onclick="excluirBanner(${b.id_linha}, this)" style="color:var(--error); background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i></button></div>
-                `;
-                bCont.appendChild(bDiv);
-            });
-        } catch (e) { console.error(e); }
-        finally { if (btn) setBtnLoading(btn, false, original); }
-    }
 
-    // FORMULÁRIO DE PRODUTO (UNIFICADO E CORRIGIDO)
+            data.banners.forEach(b => {
+                const bCard = document.createElement("div");
+                bCard.className = "item-gestao";
+                bCard.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <span class="badge-alert" style="background:var(--primary); color:white;">BANNER LINHA: ${b.id_linha}</span>
+                        <button onclick="excluirBanner(${b.id_linha}, this)" style="background:none; border:none; color:var(--error); cursor:pointer;"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="grid-dynamic">
+                        <div><label>URL Imagem</label><input type="text" id="bi-${b.id_linha}" value="${b.imagem}"></div>
+                        <div><label>Título</label><input type="text" id="bt-${b.id_linha}" value="${b.titulo}"></div>
+                        <div><label>Texto Botão</label><input type="text" id="btxt-${b.id_linha}" value="${b.textoBtn}"></div>
+                        <div><label>Link Botão</label><input type="text" id="bl-${b.id_linha}" value="${b.linkBtn}"></div>
+                        <div><label>Ativo</label>
+                            <select id="ba-${b.id_linha}">
+                                <option value="sim" ${b.ativo === 'sim' ? 'selected' : ''}>Sim</option>
+                                <option value="não" ${b.ativo === 'não' ? 'selected' : ''}>Não</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-main" style="width:100%; margin-top:15px;" onclick="salvarBanner(${b.id_linha}, this)">SALVAR BANNER</button>
+                `;
+                bCont.appendChild(bCard);
+            });
+
+        } catch (e) { 
+            console.error("Erro ao carregar dados:", e); 
+        } finally { 
+            if (btn) setBtnLoading(btn, false, original); 
+        }
+    }
+    // FORMULÁRIO DE BANNER
     document.getElementById("productForm").onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById("btnPubProd");
@@ -496,72 +499,57 @@
         };
 
         try {
-            await fetch(SCRIPT_URL, { 
+            // Removendo o 'no-cors' para ver se o Google retorna erro de permissão
+            const response = await fetch(SCRIPT_URL, { 
                 method: "POST", 
-                mode: "no-cors", 
                 body: JSON.stringify(payload) 
             });
-            alert("Produto enviado com sucesso!");
+            
+            alert("Produto enviado! Verifique a planilha.");
             e.target.reset();
             setTimeout(carregarDados, 2000);
         } catch (err) {
-            alert("Erro ao enviar produto.");
+            console.error(err);
+            alert("Ocorreu um erro no envio. Verifique o Console (F12).");
         } finally {
             setBtnLoading(btn, false, original);
         }
     };
-
-    // FORMULÁRIO DE BANNER
-    document.getElementById("bannerForm").onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById("btnPubBanner");
-        const original = btn.innerHTML;
-        setBtnLoading(btn, true);
-
-        const payload = {
-            tipo: "banner",
-            imagem: document.getElementById("b-imagem").value,
-            titulo: document.getElementById("b-titulo").value,
-            botaoTexto: document.getElementById("b-btn-texto").value,
-            botaoLink: document.getElementById("b-btn-link").value,
-            ativo: "sim"
-        };
-
-        try {
-            await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-            alert("Banner Adicionado!");
-            e.target.reset();
-            setTimeout(carregarDados, 2000);
-        } catch (err) {
-            alert("Erro ao adicionar banner.");
-        } finally {
-            setBtnLoading(btn, false, original);
-        }
-    };
-
     async function salvarProd(id, btn) {
-        const original = btn.innerHTML; setBtnLoading(btn, true);
-        const payload = {
-            tipo: "editar_produto",
-            id: id,
-            nome: document.getElementById(`n-${id}`).value,
-            ml: document.getElementById(`m-${id}`).value,
-            preco: document.getElementById(`p-${id}`).value,
-            categoria: document.getElementById(`c-${id}`).value,
-            cores: document.getElementById(`co-${id}`).value,
-            tamanho: document.getElementById(`t-${id}`).value,
-            imagem: document.getElementById(`img-${id}`).value,
-            disponivel: document.getElementById(`d-${id}`).value,
-            estoque: document.getElementById(`e-${id}`).value,
-            destaque: document.getElementById(`dest-${id}`).value
-        };
-        try { 
-            await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) }); 
-            alert("Alterações enviadas!"); 
-            setTimeout(carregarDados, 1500);
-        } finally { setBtnLoading(btn, false, original); }
-    }
+    const original = btn.innerHTML; 
+    setBtnLoading(btn, true);
+    
+    const payload = {
+        tipo: "editar_produto",
+        id: id,
+        nome: document.getElementById(`n-${id}`).value,
+        ml: document.getElementById(`m-${id}`).value,
+        preco: document.getElementById(`p-${id}`).value,
+        categoria: document.getElementById(`c-${id}`).value,
+        cores: document.getElementById(`co-${id}`).value,
+        tamanho: document.getElementById(`t-${id}`).value,
+        imagem: document.getElementById(`img-${id}`).value,
+        disponivel: document.getElementById(`d-${id}`).value,
+        estoque: document.getElementById(`e-${id}`).value, // Envia o número que está no campo
+        destaque: document.getElementById(`dest-${id}`).value
+    };
 
+    try { 
+        // Importante: usei method POST. Certifique-se que seu Script trate o "editar_produto"
+        await fetch(SCRIPT_URL, { 
+            method: "POST", 
+            mode: "no-cors", 
+            body: JSON.stringify(payload) 
+        }); 
+        alert("Produto atualizado com sucesso!"); 
+        // Não precisa dar reload na página toda, apenas recarregar os dados
+        setTimeout(carregarDados, 1000);
+    } catch (e) {
+        alert("Erro ao salvar.");
+    } finally { 
+        setBtnLoading(btn, false, original); 
+    }
+}
     async function salvarBanner(linha, btn) {
         const original = btn.innerHTML; setBtnLoading(btn, true);
         const payload = { 
@@ -690,4 +678,4 @@
 </script>
 </body>
 
-</html>
+              </html>
