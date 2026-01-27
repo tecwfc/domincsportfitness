@@ -630,19 +630,35 @@ ${itensTxt}
           // 3. Codifica a mensagem para o formato de URL
           const msgEncoded = encodeURIComponent(textoMensagem);
 
-          // 4. Tenta atualizar o estoque via API (sem travar o fluxo)
-          // 4. ATUALIZA O ESTOQUE NA PLANILHA
-          fetch(ESTOQUE_API_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify({
-              tipo: "baixa_estoque", // AGORA A PLANILHA SABE O QUE FAZER
-              items: cart.map((i) => ({
-                id: i.id.toString().split("-")[0], // PEGA SÓ O NÚMERO DO ID
-                quantity: i.quantity,
-              })),
-            }),
-          });
+         
+   
+       // 4. ATUALIZA O ESTOQUE NA PLANILHA (VERSÃO CORRIGIDA)
+const estoqueParaBaixar = {};
+
+// Agrupa produtos iguais (mesmo ID base) antes de enviar
+cart.forEach(item => {
+    const baseId = item.id.toString().split("-")[0];
+    if (estoqueParaBaixar[baseId]) {
+        estoqueParaBaixar[baseId] += item.quantity;
+    } else {
+        estoqueParaBaixar[baseId] = item.quantity;
+    }
+});
+
+// Transforma o agrupamento no formato que a planilha aceita
+const itemsFormatados = Object.keys(estoqueParaBaixar).map(id => ({
+    id: id,
+    quantity: estoqueParaBaixar[id]
+}));
+
+fetch(ESTOQUE_API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify({
+        tipo: "baixa_estoque",
+        items: itemsFormatados, 
+    }),
+});
           // 5. Abre o WhatsApp com a API oficial (mais estável)
           const whatsappUrl = `https://api.whatsapp.com/send?phone=5588999049636&text=${msgEncoded}`;
           window.open(whatsappUrl, "_blank");
@@ -720,51 +736,30 @@ ${itensTxt}
 
   document.querySelectorAll(".filtro-menu-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const categoriaAlvo = normalizarParaBusca(
-        btn.getAttribute("data-categoria"),
-      );
+        const categoriaAlvo = normalizarParaBusca(btn.getAttribute("data-categoria"));
 
-      console.log("Filtrando por:", categoriaAlvo); // Para você testar no console F12
+        // --- CORREÇÃO AQUI: Fechar o menu mobile ao clicar ---
+        const mobileMenu = document.getElementById("mobile-menu");
+        const mobileOverlay = document.getElementById("mobile-overlay");
+        
+        if (mobileMenu) mobileMenu.classList.add("translate-x-full");
+        if (mobileOverlay) mobileOverlay.classList.add("hidden");
+        // ----------------------------------------------------
 
-      let produtosFiltrados;
+        // Resto da sua lógica de filtro...
+        let produtosFiltrados = categoriaAlvo === "todos" 
+            ? allProducts 
+            : allProducts.filter(p => normalizarParaBusca(p["Categoria"]).includes(categoriaAlvo));
 
-      if (categoriaAlvo === "todos") {
-        produtosFiltrados = allProducts;
-      } else {
-        produtosFiltrados = allProducts.filter((p) => {
-          const categoriaPlanilha = normalizarParaBusca(p["Categoria"]);
+        renderProducts(produtosFiltrados);
 
-          // Lógica especial para garrafas (pega garrafa, térmica, etc)
-          if (categoriaAlvo === "garrafas") {
-            return (
-              categoriaPlanilha.includes("garrafa") ||
-              categoriaPlanilha.includes("termica")
-            );
-          }
-
-          // Lógica para Feminino (pega se na planilha estiver 'roupa feminino' ou só 'feminino')
-          if (categoriaAlvo === "feminino") {
-            return categoriaPlanilha.includes("feminino");
-          }
-
-          // Lógica para Masculino
-          if (categoriaAlvo === "masculino") {
-            return categoriaPlanilha.includes("masculino");
-          }
-
-          // Para acessórios e outros (comparação flexível)
-          return categoriaPlanilha.includes(categoriaAlvo);
-        });
-      }
-
-      renderProducts(produtosFiltrados);
-
-      // Rola para a seção de produtos
-      const sectionProdutos = document.getElementById("produtos");
-      if (sectionProdutos)
-        sectionProdutos.scrollIntoView({ behavior: "smooth", block: "start" });
+        // Rola para a seção de produtos
+        const sectionProdutos = document.getElementById("produtos");
+        if (sectionProdutos) {
+            sectionProdutos.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
     });
-  });
+});
 
   // Busca em tempo real
   const searchInputTop = document.getElementById("search-input-top");
