@@ -175,20 +175,16 @@ function renderDestaques(products) {
   if (!destaquesContainer) return;
   const secaoDestaques = document.getElementById("destaques");
 
-  // Procure por este bloco:
-  const destaques = products
-    .filter((p) => {
-      const estoque = parseInt(p["Saldo Estoque"]) || 0;
-      const disponivel = (p["Disponível"] || "").trim().toLowerCase(); // ADICIONE ESTA LINHA
+  const destaques = products.filter((p) => {
+    const estoque = parseInt(p["Saldo Estoque"]) || 0;
+    const disponivel = (p["Disponível"] || "").trim().toLowerCase();
+    const ehDestaque = (p["Destaque"] || "").trim().toLowerCase() === "sim";
 
-      // ATUALIZE O RETURN ABAIXO:
-      return p["Destaque"]?.toLowerCase() === "sim" &&
-        estoque > 0 &&
-        disponivel !== "não" &&
-        disponivel !== "nao";
-    })
-    .slice(0, 12);
+    // Só entra se: for Destaque E tiver estoque E não for "não"
+    return ehDestaque && estoque > 0 && disponivel !== "não" && disponivel !== "nao";
+  }).slice(0, 12);
 
+  // Se não houver produtos com estoque para o destaque, esconde a seção inteira
   if (destaques.length === 0) {
     if (secaoDestaques) secaoDestaques.classList.add("hidden");
     return;
@@ -199,37 +195,27 @@ function renderDestaques(products) {
   destaquesContainer.innerHTML = "";
   destaques.forEach((p) => {
     const estoqueReal = parseInt(p["Saldo Estoque"]) || 0;
-    const statusDisponivel = (p["Disponível"] || "").trim().toLowerCase(); // <--- ADICIONE ESTA LINHA
-    const isEsgotado = estoqueReal <= 0 || statusDisponivel === "esgotado"; // <--- ADICIONE ESTA LINHA
     const isUltimasUnidades = estoqueReal > 0 && estoqueReal <= 3;
 
-    // Agora o clickAction vai funcionar porque isEsgotado foi definido acima
-    let clickAction = isEsgotado
-      ? ""
-      : `openSizeSelector('${p["ID"]}', '${p["Nome do Produto"]}', ${p["Preço"]}, '${p["Imagem"]}')`;
-
-    let btnText = isEsgotado ? "Esgotado" : "Escolher Opções";
+    let clickAction = `openSizeSelector('${p["ID"]}', '${p["Nome do Produto"]}', ${p["Preço"]}, '${p["Imagem"]}')`;
 
     const slide = document.createElement("div");
     slide.className = "swiper-slide flex justify-center";
     slide.innerHTML = `
-    <div class="bg-white rounded-3xl overflow-hidden border-2 border-accent shadow-lg flex flex-col max-w-xs w-full relative">
+    <div class="bg-white rounded-3xl overflow-hidden border-2 border-accent shadow-lg flex flex-col max-w-xs w-full relative h-full">
         <div class="relative h-48 bg-slate-50 flex items-center justify-center">
             <img src="${driveImg(p["Imagem"])}" class="max-h-full max-w-full object-contain transition duration-500"/>
             <span class="absolute top-3 left-3 bg-accent text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Destaque</span>
-            ${isUltimasUnidades
-        ? '<span class="absolute bottom-3 right-3 bg-orange-500 text-white text-[9px] font-black px-2 py-1 rounded-lg shadow-lg animate-pulse uppercase z-10">Últimas Unidades</span>'
-        : ""
-      }
+            ${isUltimasUnidades ? '<span class="absolute bottom-3 right-3 bg-orange-500 text-white text-[9px] font-black px-2 py-1 rounded-lg shadow-lg animate-pulse uppercase z-10">Últimas Unidades</span>' : ""}
         </div>
-        <div class="p-4 flex flex-col gap-1">
+        <div class="p-4 flex flex-col gap-1 flex-1">
             <span class="text-[10px] font-bold text-accent uppercase">${p["Categoria"]}</span>
             <h3 class="font-bold text-sm text-textDark leading-snug h-10 overflow-hidden">${p["Nome do Produto"]}</h3>
             <p class="text-[10px] font-bold ${isUltimasUnidades ? "text-orange-500" : "text-green-600"}">
                 ${isUltimasUnidades ? `Resta(m) apenas ${estoqueReal}!` : `Em estoque: ${estoqueReal}`}
             </p>
             <p class="text-lg font-black text-primary mt-1">R$ ${p["Preço"].toFixed(2).replace(".", ",")}</p>
-            <button onclick="${clickAction}" class="w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition bg-primary text-white hover:bg-accent">${btnText}</button>
+            <button onclick="${clickAction}" class="w-full mt-auto py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition bg-primary text-white hover:bg-accent">Escolher Opções</button>
         </div>
     </div>`;
     destaquesContainer.appendChild(slide);
@@ -246,64 +232,42 @@ function renderDestaques(products) {
 
 // --- RENDERIZAÇÃO DE PRODUTOS ---
 function renderProducts(products) {
-  productsContainer.innerHTML = "";
-      products.forEach((p) => {
-      // ADICIONE ESTAS LINHAS LOGO ABAIXO:
-      const disponivelNaPlanilha = (p["Disponível"] || "").trim().toLowerCase();
-      if (disponivelNaPlanilha === "não" || disponivelNaPlanilha === "nao") {
-        return; // Pula este produto e não renderiza o card
-      }
+    productsContainer.innerHTML = "";
+    
+    products.forEach((p) => {
+        // 1. Pega os valores e limpa espaços/letras minúsculas
+        const estoqueReal = parseInt(p["Saldo Estoque"]) || 0;
+        const disponivelStatus = (p["Disponível"] || "").trim().toLowerCase();
 
-      const estoqueReal = parseInt(p["Saldo Estoque"]) || 0;
-      const statusDisponivel = (p["Disponível"] || "").trim().toLowerCase();
-      const isEsgotado = estoqueReal <= 0 || statusDisponivel === "esgotado";
-      const isUltimasUnidades = estoqueReal > 0 && estoqueReal <= 3;
-
-      // AQUI ESTÁ A MUDANÇA: Todos os produtos agora chamam o 'openSizeSelector'
-      let clickAction = isEsgotado
-        ? ""
-        : `openSizeSelector('${p["ID"]}','${p["Nome do Produto"]}',${p["Preço"]},'${p["Imagem"]}')`;
-
-      let btnText = isEsgotado ? "Esgotado" : "Escolher Opções";
-
-      const card = document.createElement("div");
-      card.className =
-        "bg-white rounded-3xl overflow-hidden border border-slate-100 group hover:shadow-xl transition-all duration-300 flex flex-col h-full relative";
-      const infoVariacao = p["ML"]
-        ? `Tamanhos: ${p["ML"]}`
-        : p["Tamanho"]
-          ? `Tam: ${p["Tamanho"]}`
-          : "";
-      card.innerHTML = `
-        <div class="relative aspect-[4/5] bg-slate-50 overflow-hidden">
-            <img src="${driveImg(p["Imagem"])}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500 ${isEsgotado ? "grayscale opacity-50" : ""}">
-            ${isEsgotado
-          ? '<div class="absolute inset-0 flex items-center justify-center font-black text-red-500 uppercase tracking-widest text-sm bg-white/40 backdrop-blur-[2px]">Esgotado</div>'
-          : isUltimasUnidades
-            ? '<div class="absolute bottom-3 right-3 bg-orange-500 text-white text-[9px] font-black px-2 py-1 rounded-lg shadow-lg animate-pulse uppercase z-10">Últimas Unidades</div>'
-            : ""
+        // 2. A REGRA DE OURO: Se não tem estoque OU está marcado como "não", PARA TUDO e pula pro próximo
+        if (estoqueReal <= 0 || disponivelStatus === "não" || disponivelStatus === "nao") {
+            return; 
         }
-        </div>
-        <div class="p-4 flex flex-col flex-1">
-            <span class="text-[10px] font-bold text-accent uppercase tracking-tighter mb-1">${p["Categoria"]}</span>
-            <h3 class="font-bold text-sm text-textDark leading-tight mb-1 h-10 overflow-hidden">${p["Nome do Produto"]}</h3>
-            <div class="mt-auto">
-                <p class="text-xs font-bold ${isEsgotado ? "text-red-500" : isUltimasUnidades ? "text-orange-500" : "text-green-600"} mb-1">
-                    ${isEsgotado ? "Indisponível" : isUltimasUnidades ? `Corra! Apenas ${estoqueReal} em estoque` : "Em estoque: " + estoqueReal}
-                </p>
-                <p class="text-lg font-black text-primary mb-3">R$ ${p["Preço"].toFixed(2).replace(".", ",")}</p>
-                <button onclick="${clickAction}" ${isEsgotado ? "disabled" : ""} 
-                    class="w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition ${isEsgotado
-          ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-          : "bg-primary text-white hover:bg-accent hover:shadow-md"
-        }">${btnText}</button>
+
+        // 3. Se passou pela regra acima, ele desenha o card
+        const isUltimas = estoqueReal <= 3;
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-3xl overflow-hidden border border-slate-100 flex flex-col h-full relative";
+        
+        card.innerHTML = `
+            <div class="relative aspect-[4/5] bg-slate-50">
+                <img src="${driveImg(p["Imagem"])}" class="w-full h-full object-cover">
+                ${isUltimas ? '<div class="absolute bottom-2 right-2 bg-orange-500 text-white text-[8px] font-bold px-2 py-1 rounded-lg animate-pulse">ÚLTIMAS UNIDADES</div>' : ''}
             </div>
-        </div>`;
-
-      productsContainer.appendChild(card);
+            <div class="p-4 flex flex-col flex-1">
+                <span class="text-[10px] font-bold text-accent uppercase">${p["Categoria"]}</span>
+                <h3 class="font-bold text-sm text-textDark mb-2 h-10 overflow-hidden">${p["Nome do Produto"]}</h3>
+                <div class="mt-auto">
+                    <p class="text-lg font-black text-primary mb-3">R$ ${p["Preço"].toFixed(2).replace(".", ",")}</p>
+                    <button onclick="openSizeSelector('${p["ID"]}','${p["Nome do Produto"]}',${p["Preço"]},'${p["Imagem"]}')" 
+                        class="w-full py-3 rounded-xl font-bold text-[10px] uppercase bg-primary text-white hover:bg-accent transition">
+                        Escolher Opções
+                    </button>
+                </div>
+            </div>`;
+        productsContainer.appendChild(card);
     });
-  }
-
+}
 // --- FUNÇÃO PARA ADICIONAR AO CARRINHO ---
 function addToCart(id, name, price, img) {
       // 1. Encontrar o saldo original do produto na planilha
