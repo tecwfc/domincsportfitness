@@ -1,681 +1,395 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dominc Admin | Gestão Enterprise</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap"
-    rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dominc Admin | Gestão Enterprise</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
-  <style>
-    :root {
-      --primary: #8e5fb1;
-      --primary-dark: #6a3d8b;
-      --accent: #d4a5ff;
-      --bg: #0b0612;
-      --card-bg: rgba(255, 255, 255, 0.03);
-      --border: rgba(255, 255, 255, 0.08);
-      --text: #ffffff;
-      --gray: #94a3b8;
-      --error: #ff4d4d;
-      --warning: #f59e0b;
-      --success: #4ade80;
-      --sidebar-w: 240px;
-    }
+    <style>
+        :root {
+            --primary: #8e5fb1;
+            --primary-dark: #6a3d8b;
+            --accent: #d4a5ff;
+            --bg: #0b0612;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #ffffff;
+            --gray: #94a3b8;
+            --error: #ff4d4d;
+            --warning: #f59e0b;
+            --success: #4ade80;
+            --sidebar-w: 240px;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Plus Jakarta Sans", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; overflow-x: hidden; }
 
-    body {
-      font-family: "Plus Jakarta Sans", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      overflow-x: hidden;
-    }
+        /* --- LOGIN --- */
+        #login-overlay { position: fixed; inset: 0; background: #0b0612; display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .login-box { background: var(--card-bg); backdrop-filter: blur(40px); border: 1px solid var(--border); padding: 40px; border-radius: 40px; text-align: center; width: 320px; }
 
-    aside {
-      width: var(--sidebar-w);
-      background: rgba(0, 0, 0, 0.4);
-      border-right: 1px solid var(--border);
-      height: 100vh;
-      position: fixed;
-      padding: 30px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      z-index: 100;
-    }
+        /* --- SIDEBAR --- */
+        aside { width: var(--sidebar-w); background: rgba(0, 0, 0, 0.4); border-right: 1px solid var(--border); height: 100vh; position: fixed; padding: 30px 20px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+        .nav-link { padding: 14px 18px; border-radius: 12px; color: var(--gray); text-decoration: none; display: flex; align-items: center; gap: 12px; transition: 0.3s; cursor: pointer; font-weight: 500; }
+        .nav-link.active { background: var(--primary); color: white; font-weight: 700; }
 
-    .nav-link {
-      padding: 14px 18px;
-      border-radius: 12px;
-      color: var(--gray);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: 0.3s;
-      cursor: pointer;
-      font-weight: 500;
-    }
+        /* --- LAYOUT --- */
+        main { margin-left: var(--sidebar-w); flex: 1; padding: 40px; }
+        .page-content { display: none; animation: fadeIn 0.4s ease; }
+        .page-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .nav-link:hover {
-      color: var(--accent);
-      background: rgba(255, 255, 255, 0.05);
-    }
+        .section-card { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 24px; margin-bottom: 30px; }
+        .grid-dynamic { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
 
-    .nav-link.active {
-      background: var(--primary);
-      color: white;
-      font-weight: 700;
-      box-shadow: 0 4px 15px rgba(142, 95, 177, 0.3);
-    }
+        label { display: block; font-weight: 700; font-size: 0.65rem; text-transform: uppercase; color: var(--accent); margin: 10px 0 5px 2px; }
+        input, select { width: 100%; padding: 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border); color: white; outline: none; }
 
-    main {
-      margin-left: var(--sidebar-w);
-      flex: 1;
-      padding: 40px;
-    }
+        .btn-main { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; }
 
-    .page-content {
-      display: none;
-      animation: fadeIn 0.4s ease;
-    }
+        /* --- CARDS DE GESTÃO --- */
+        .item-gestao { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
+        .gestao-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 15px; }
+        .gestao-body { display: grid; grid-template-columns: 120px 1fr; gap: 20px; }
+        .gestao-inputs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 
-    .page-content.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .section-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      padding: 30px;
-      border-radius: 24px;
-      margin-bottom: 30px;
-    }
-
-    .grid-dynamic {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-    }
-
-    label {
-      display: block;
-      font-weight: 700;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin: 10px 0 5px 2px;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--border);
-      color: white;
-      outline: none;
-    }
-
-    .btn-main {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-main:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(142, 95, 177, 0.4);
-    }
-
-    .btn-main:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      filter: grayscale(0.5);
-    }
-
-    .item-gestao {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    .badge-alert {
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    #login-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-    }
-
-    .login-box {
-      background: var(--card-bg);
-      backdrop-filter: blur(40px);
-      border: 1px solid var(--border);
-      padding: 40px;
-      border-radius: 40px;
-      text-align: center;
-      width: 320px;
-    }
-  </style>
+        /* --- MOBILE RESPONSIVO --- */
+        @media (max-width: 768px) {
+            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; padding: 5px; border-right: none; border-top: 1px solid var(--border); background: rgba(11, 6, 18, 0.98); backdrop-filter: blur(10px); }
+            aside div:first-child { display: none; }
+            .nav-link { flex-direction: column; gap: 4px; font-size: 10px; padding: 5px; flex: 1; justify-content: center; text-align: center; }
+            main { margin-left: 0; padding: 20px 15px 100px 15px; }
+            .gestao-body { grid-template-columns: 1fr; }
+            .gestao-inputs { grid-template-columns: 1fr; }
+            .grid-dynamic { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
 </head>
-
 <body>
 
-  <div id="login-overlay">
-    <div class="login-box">
-      <h2 style="letter-spacing: 3px; margin-bottom: 20px;">DOMINC</h2>
-      <input type="password" id="admin-pass" placeholder="SENHA"
-        style="text-align: center; letter-spacing: 5px; margin-bottom: 20px;" />
-      <button id="btnLogin" class="btn-main" style="width: 100%;" onclick="checkPass()">ENTRAR</button>
-    </div>
-  </div>
-
-  <aside id="sidebar" style="display: none;">
-    <div style="font-weight: 800; color: var(--accent); margin-bottom: 40px; font-size: 1.4rem; text-align: center;">
-      DOMINC</div>
-    <div class="nav-link active" onclick="showPage('page-cadastros', this)"><i class="fas fa-plus-circle"></i>
-      <span>Cadastros</span></div>
-    <div class="nav-link" onclick="showPage('page-estoque', this)"><i class="fas fa-boxes-stacked"></i>
-      <span>Estoque</span></div>
-    <div class="nav-link" onclick="showPage('page-banners', this)"><i class="fas fa-images"></i> <span>Banners</span>
-    </div>
-    <button onclick="logout()"
-      style="margin-top: auto; background: none; border: none; color: var(--error); cursor: pointer; padding: 15px; font-weight: bold; display: flex; align-items: center; gap: 10px;">
-      <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
-    </button>
-  </aside>
-
-  <main id="admin-content" style="display: none;">
-
-    <div id="page-cadastros" class="page-content active">
-      <div class="section-card">
-        <div style="margin-bottom: 25px;">
-          <h2><i class="fas fa-plus-circle"></i> Novo Produto</h2>
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2 style="letter-spacing: 3px; margin-bottom: 20px;">DOMINC</h2>
+            <input type="password" id="admin-pass" placeholder="SENHA" style="text-align: center; letter-spacing: 5px; margin-bottom: 20px;" />
+            <button id="btnLogin" class="btn-main" onclick="checkPass()">ENTRAR</button>
         </div>
-        <form id="productForm">
-          <div class="grid-dynamic">
-            <div><label>Nome</label><input type="text" id="nome" required></div>
-            <div><label>Categoria</label>
-              <select id="categoria">
-                <option value="Garrafas">Garrafas</option>
-                <option value="feminino">Feminino</option>
-                <option value="masculino">Masculino</option>
-                <option value="Acessórios">Acessórios</option>
-              </select>
+    </div>
+
+    <aside id="sidebar" style="display: none;">
+        <div style="font-weight: 800; color: var(--accent); margin-bottom: 40px; font-size: 1.4rem; text-align: center;">DOMINC</div>
+        <div class="nav-link active" onclick="showPage('page-cadastros', this)"><i class="fas fa-plus-circle"></i><span>Cadastros</span></div>
+        <div class="nav-link" onclick="showPage('page-estoque', this)"><i class="fas fa-boxes-stacked"></i><span>Estoque</span></div>
+        <div class="nav-link" onclick="showPage('page-banners', this)"><i class="fas fa-images"></i><span>Banners</span></div>
+        <div class="nav-link" onclick="logout()" style="color: var(--error);"><i class="fas fa-sign-out-alt"></i><span>Sair</span></div>
+    </aside>
+
+    <main id="admin-content" style="display: none;">
+        
+        <div id="page-cadastros" class="page-content active">
+            <div class="section-card">
+                <h2><i class="fas fa-plus-circle"></i> Novo Produto</h2>
+                <form id="productForm" style="margin-top:20px;">
+                    <div class="grid-dynamic">
+                        <div><label>Nome</label><input type="text" id="nome" required></div>
+                        <div><label>Categoria</label>
+                            <select id="categoria">
+                                <option value="Garrafas">Garrafas</option>
+                                <option value="Feminino">Feminino</option>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Acessórios">Acessórios</option>
+                            </select>
+                        </div>
+                        <div><label>ML</label><input type="text" id="ml" placeholder="Ex: 500ml"></div>
+                        <div><label>Preço</label><input type="number" step="0.01" id="preco" required></div>
+                        <div><label>Cores</label><input type="text" id="cores"></div>
+                        <div><label>Tamanhos</label><input type="text" id="tamanho"></div>
+                        <div><label>Estoque Inicial</label><input type="number" id="estoque" required></div>
+                        <div><label>Disponível</label><select id="disponivel"><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
+                        <div><label>Destaque</label><select id="destaque"><option value="não">Não</option><option value="sim">Sim</option></select></div>
+                    </div>
+                    <label>URL Imagem</label><input type="url" id="imagem">
+                    <button type="submit" class="btn-main" id="btnPubProd" style="margin-top: 25px;">PUBLICAR PRODUTO</button>
+                </form>
             </div>
-            <div><label>ML</label><input type="text" id="ml" placeholder="ex: 500ml"></div>
-            <div><label>Preço</label><input type="number" step="0.01" id="preco" required></div>
-            <div><label>Cores</label><input type="text" id="cores" placeholder="Azul, Rosa"></div>
-            <div><label>Tamanhos</label><input type="text" id="tamanho" placeholder="P, M, G"></div>
-            <div><label>Estoque Inicial</label><input type="number" id="estoque" required></div>
-            <div><label>Disponível</label><select id="disponivel">
-                <option value="Sim">Sim</option>
-                <option value="Não">Não</option>
-              </select></div>
-            <div><label>Destaque</label><select id="destaque">
-                <option value="não">Não</option>
-                <option value="sim">Sim</option>
-              </select></div>
-          </div>
-          <label>URL Imagem</label><input type="url" id="imagem">
-          <button type="submit" class="btn-main" id="btnPubProd" style="width: 100%; margin-top: 25px;">PUBLICAR
-            PRODUTO</button>
-        </form>
-      </div>
 
-      <div class="section-card">
-        <div style="margin-bottom: 25px;">
-          <h2><i class="fas fa-image"></i> Novo Banner</h2>
+            <div class="section-card">
+                <h2><i class="fas fa-image"></i> Novo Banner</h2>
+                <form id="bannerForm" style="margin-top:20px;">
+                    <div class="grid-dynamic">
+                        <div><label>URL Imagem</label><input type="text" id="b-imagem" required></div>
+                        <div><label>Título</label><input type="text" id="b-titulo"></div>
+                        <div><label>Texto Botão</label><input type="text" id="b-btn-texto" placeholder="Ex: Ver Agora"></div>
+                        <div><label>Link Botão</label><input type="text" id="b-btn-link" placeholder="#produtos"></div>
+                    </div>
+                    <button type="submit" class="btn-main" id="btnPubBanner" style="margin-top: 25px;">ADICIONAR BANNER</button>
+                </form>
+            </div>
         </div>
-        <form id="bannerForm">
-          <div class="grid-dynamic">
-            <div><label>URL Imagem</label><input type="text" id="b-imagem" required></div>
-            <div><label>Título</label><input type="text" id="b-titulo"></div>
-            <div><label>Texto Botão</label><input type="text" id="b-btn-texto"></div>
-            <div><label>Link Botão</label><input type="text" id="b-btn-link" placeholder="#produtos"></div>
-          </div>
-          <button type="submit" class="btn-main" id="btnPubBanner" style="width: 100%; margin-top: 25px;">ADICIONAR
-            BANNER</button>
-        </form>
-      </div>
-    </div>
 
-    <div id="page-estoque" class="page-content">
-      <div class="section-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h2><i class="fas fa-boxes-stacked"></i> Gestão de Estoque</h2>
-          <div style="display: flex; gap: 10px;">
-            <button id="btnPdf" onclick="gerarPDF()" class="btn-main"
-              style="background: var(--success); color: #000; padding: 8px 15px; font-size: 11px;"><i
-                class="fas fa-file-pdf"></i> PDF ESTOQUE</button>
-            <button id="btnAtualizar" onclick="carregarDados()" class="btn-main"
-              style="background: var(--card-bg); padding: 8px 15px; font-size: 11px;"><i class="fas fa-sync"></i>
-              ATUALIZAR</button>
-          </div>
+        <div id="page-estoque" class="page-content">
+            <div class="section-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap:10px;">
+                    <h2><i class="fas fa-boxes-stacked"></i> Estoque & Edição</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="gerarPDF()" class="btn-main" style="background:var(--success); color:#000; width:auto; padding:8px 15px;"><i class="fas fa-file-pdf"></i> PDF</button>
+                        <button id="btnAtualizar" onclick="carregarDados()" class="btn-main" style="background:var(--card-bg); width:auto; padding:8px 15px;"><i class="fas fa-sync"></i> ATUALIZAR</button>
+                    </div>
+                </div>
+                <input type="text" id="busca-admin" placeholder="🔍 Pesquisar produto...">
+                <div id="lista-gestao" style="margin-top:20px;">Carregando...</div>
+            </div>
         </div>
-        <input type="text" id="busca-admin" placeholder="🔍 Pesquisar por nome ou ID..."
-          style="margin-bottom: 25px; background: rgba(255,255,255,0.08);">
-        <div id="lista-gestao">Carregando estoque...</div>
-      </div>
-    </div>
 
-    <div id="page-banners" class="page-content">
-      <div class="section-card">
-        <div style="margin-bottom: 25px;">
-          <h2><i class="fas fa-images"></i> Gestão de Banners</h2>
+        <div id="page-banners" class="page-content">
+            <div class="section-card">
+                <h2><i class="fas fa-images"></i> Gestão de Banners</h2>
+                <div id="lista-banners" style="margin-top:20px;"></div>
+            </div>
         </div>
-        <div id="lista-banners"></div>
-      </div>
-    </div>
+    </main>
 
-  </main>
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOy9ngHSvcY_LkngnJwgXu9bzzGJZhZM_0-LwRfF5q-eGuMHOrySLmON3M_swCPxXhxg/exec";
+        let dadosLocais = { produtos: [], banners: [] };
 
-  <script>
-    
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOy9ngHSvcY_LkngnJwgXu9bzzGJZhZM_0-LwRfF5q-eGuMHOrySLmON3M_swCPxXhxg/exec";
-    let dadosLocais = { produtos: [], banners: [] };
-
-    function setBtnLoading(btn, isLoading, originalText) {
-        if (!btn) return;
-        if (isLoading) {
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> PROCESSANDO...`;
-        } else {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+        function setBtnLoading(btn, isLoading, originalText) {
+            if (!btn) return;
+            btn.disabled = isLoading;
+            btn.innerHTML = isLoading ? `<i class="fas fa-spinner fa-spin"></i> AGUARDE...` : originalText;
         }
-    }
 
-    function showPage(pageId, element) {
-        document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        element.classList.add('active');
-    }
-
-    function fixImgUrl(url) {
-        if (!url || !url.includes('drive.google.com')) return url;
-        let id = "";
-        if (url.includes('id=')) {
-            id = url.split('id=')[1].split('&')[0];
-        } else {
-            const parts = url.split('/');
-            id = parts[parts.indexOf('d') + 1];
+        function fixImgUrl(url) {
+            if (!url || !url.includes('drive.google.com')) return url;
+            const match = url.match(/id=([^&]+)|d\/([^/]+)/);
+            const id = match ? (match[1] || match[2]) : "";
+            return id ? `https://docs.google.com/uc?export=view&id=${id}` : url;
         }
-        return `https://docs.google.com/uc?export=view&id=${id}`;
-    }
 
-    async function checkPass() {
-        const btn = document.getElementById("btnLogin");
-        const original = btn.innerHTML;
-        setBtnLoading(btn, true);
-        const pass = document.getElementById("admin-pass").value;
-        try {
-            const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ tipo: "login", senha: pass }) });
-            const data = await res.json();
-            if (data.auth) { 
-                localStorage.setItem("dominc_logado", "true"); 
-                location.reload(); 
-            } else { 
-                alert("Senha incorreta"); 
-                setBtnLoading(btn, false, original); 
+        // --- LOGIN ---
+        async function checkPass() {
+            const btn = document.getElementById("btnLogin");
+            const pass = document.getElementById("admin-pass").value;
+            if (!pass) return alert("Digite a senha");
+            const original = btn.innerHTML;
+            setBtnLoading(btn, true);
+            try {
+                const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ tipo: "login", senha: pass }) });
+                const data = await res.json();
+                if (data.auth) { localStorage.setItem("dominc_logado", "true"); location.reload(); } 
+                else { alert("Senha incorreta"); setBtnLoading(btn, false, original); }
+            } catch (e) { alert("Erro de conexão"); setBtnLoading(btn, false, original); }
+        }
+        document.getElementById("admin-pass").addEventListener("keypress", (e) => { if (e.key === "Enter") checkPass(); });
+
+        window.onload = () => {
+            if (localStorage.getItem("dominc_logado") === "true") {
+                document.getElementById("login-overlay").style.display = "none";
+                document.getElementById("admin-content").style.display = "block";
+                document.getElementById("sidebar").style.display = "flex";
+                carregarDados();
             }
-        } catch (e) { 
-            alert("Erro de conexão"); 
-            setBtnLoading(btn, false, original); 
+        };
+
+        function logout() { localStorage.removeItem("dominc_logado"); location.reload(); }
+        function showPage(pageId, element) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            element.classList.add('active');
         }
-    }
 
-    window.onload = () => {
-        if (localStorage.getItem("dominc_logado") === "true") {
-            document.getElementById("login-overlay").style.display = "none";
-            document.getElementById("admin-content").style.display = "block";
-            document.getElementById("sidebar").style.display = "flex";
-            carregarDados();
+        // --- CARREGAR DADOS ---
+        async function carregarDados() {
+            const btn = document.getElementById("btnAtualizar");
+            const original = btn ? btn.innerHTML : "";
+            if (btn) setBtnLoading(btn, true);
+            try {
+                const res = await fetch(SCRIPT_URL);
+                const data = await res.json();
+                dadosLocais = data;
+                renderEstoque(data.produtos);
+                renderBanners(data.banners);
+            } catch (e) { console.error(e); } finally { if (btn) setBtnLoading(btn, false, original); }
         }
-    };
 
-    function logout() { localStorage.removeItem("dominc_logado"); location.reload(); }
-
-    async function carregarDados() {
-        const btn = document.getElementById("btnAtualizar");
-        const original = btn ? btn.innerHTML : "";
-        if (btn) setBtnLoading(btn, true);
-
-        try {
-            const res = await fetch(SCRIPT_URL);
-            const data = await res.json();
-            dadosLocais = data;
-
-            // --- RENDERIZAR PRODUTOS (ESTOQUE) ---
+        // --- RENDERIZAR PRODUTOS ---
+        function renderEstoque(produtos) {
             const pCont = document.getElementById("lista-gestao");
             pCont.innerHTML = "";
-            
-            data.produtos.forEach(p => {
-                const estoqueInicial = parseInt(p.estoque) || 0;
-                const vendidos = parseInt(p.vendidos) || 0;
-                const saldoReal = estoqueInicial - vendidos;
-
-                let estoqueColor = "white";
-                let alertBadge = "";
-                if (saldoReal < 5 && saldoReal > 0) {
-                    estoqueColor = "var(--warning)";
-                    alertBadge = `<span class="badge-alert" style="background:var(--warning); color:black;">Baixo</span>`;
-                }
-                if (saldoReal <= 0) {
-                    estoqueColor = "var(--error)";
-                    alertBadge = `<span class="badge-alert" style="background:var(--error); color:white;">Esgotado</span>`;
-                }
-
+            produtos.forEach(p => {
+                const saldo = (parseInt(p.estoque) || 0) - (parseInt(p.vendidos) || 0);
+                const color = saldo <= 0 ? "var(--error)" : (saldo < 5 ? "var(--warning)" : "var(--success)");
                 const card = document.createElement("div");
                 card.className = "item-gestao";
                 card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <div><span class="badge-alert" style="background:var(--accent); color:black;">ID: ${p.id}</span> ${alertBadge}</div>
+                    <div class="gestao-header">
+                        <span><b style="color:var(--accent)">ID: ${p.id}</b></span>
                         <button onclick="excluirProd('${p.id}', this)" style="background:none; border:none; color:var(--error); cursor:pointer;"><i class="fas fa-trash"></i></button>
                     </div>
-                    <div style="display:flex; gap:20px; flex-wrap:wrap;">
-                        <div style="flex:1; min-width:100px; text-align:center;">
-                            <img src="${fixImgUrl(p.imagem)}" style="width:80px; height:80px; border-radius:12px; object-fit:cover;">
-                            <input type="text" id="img-${p.id}" value="${p.imagem}" style="font-size:8px; margin-top:5px;">
+                    <div class="gestao-body">
+                        <div style="text-align:center;">
+                            <img src="${fixImgUrl(p.imagem)}" style="width:100%; aspect-ratio:1; border-radius:12px; object-fit:cover; border:1px solid var(--border);">
+                            <label style="font-size:8px; margin-top:5px;">URL Imagem</label>
+                            <input type="text" id="img-${p.id}" value="${p.imagem || ''}" style="font-size:9px;">
                         </div>
-                        <div class="grid-dynamic" style="flex:4;">
-                            <div><label>Nome</label><input type="text" id="n-${p.id}" value="${p.nome}"></div>
-                            <div><label>Preço</label><input type="number" id="p-${p.id}" value="${p.preco}"></div>
-                            <div><label style="color:var(--accent)">Estoque Inicial (K)</label><input type="number" id="e-${p.id}" value="${estoqueInicial}"></div>
-                            <div><label>Vendas (L)</label><input type="number" value="${vendidos}" disabled style="opacity:0.5;"></div>
-                            <div><label style="color:${estoqueColor}">Saldo Atual</label><div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; font-weight:bold;">${saldoReal}</div></div>
-                            <div><label>Categoria</label><input type="text" id="c-${p.id}" value="${p.categoria}"></div>
+                        <div class="gestao-inputs">
+                            <div style="grid-column: span 2;"><label>Nome</label><input type="text" id="n-${p.id}" value="${p.nome || ''}"></div>
+                            <div><label>Categoria</label>
+                                <select id="c-${p.id}">
+                                    <option value="Garrafas" ${p.categoria === 'Garrafas' ? 'selected' : ''}>Garrafas</option>
+                                    <option value="Feminino" ${p.categoria === 'Feminino' ? 'selected' : ''}>Feminino</option>
+                                    <option value="Masculino" ${p.categoria === 'Masculino' ? 'selected' : ''}>Masculino</option>
+                                    <option value="Acessórios" ${p.categoria === 'Acessórios' ? 'selected' : ''}>Acessórios</option>
+                                </select>
+                            </div>
+                            <div><label>ML</label><input type="text" id="m-${p.id}" value="${p.ml || ''}"></div>
+                            <div><label>Preço</label><input type="number" step="0.01" id="p-${p.id}" value="${p.preco || 0}"></div>
+                            <div><label>Estoque Total</label><input type="number" id="e-${p.id}" value="${p.estoque || 0}"></div>
+                            <div><label>Cores</label><input type="text" id="co-${p.id}" value="${p.cores || ''}"></div>
+                            <div><label>Tamanhos</label><input type="text" id="t-${p.id}" value="${p.tamanho || ''}"></div>
+                            <div><label>Disponível</label>
+                                <select id="d-${p.id}">
+                                    <option value="Sim" ${p.disponivel === 'Sim' ? 'selected' : ''}>Sim</option>
+                                    <option value="Não" ${p.disponivel === 'Não' ? 'selected' : ''}>Não</option>
+                                </select>
+                            </div>
+                            <div><label>Destaque</label>
+                                <select id="dest-${p.id}">
+                                    <option value="não" ${p.destaque === 'não' ? 'selected' : ''}>Não</option>
+                                    <option value="sim" ${p.destaque === 'sim' ? 'selected' : ''}>Sim</option>
+                                </select>
+                            </div>
+                            <div style="grid-column: span 2; text-align:center; padding:10px; background:rgba(0,0,0,0.2); border-radius:8px;">
+                                <small style="color:${color}">Saldo Atual: ${saldo}</small>
+                            </div>
                         </div>
                     </div>
-                    <button class="btn-main" style="width:100%; margin-top:10px; background:var(--success); color:#000;" onclick="salvarProd('${p.id}', this)">SALVAR PRODUTO</button>
+                    <button class="btn-main" style="margin-top:20px; background:var(--success); color:#000;" onclick="salvarProd('${p.id}', this)">SALVAR ALTERAÇÕES</button>
                 `;
                 pCont.appendChild(card);
             });
+        }
 
-            // --- RENDERIZAR BANNERS (O QUE ESTAVA FALTANDO) ---
+        // --- RENDERIZAR BANNERS ---
+        function renderBanners(banners) {
             const bCont = document.getElementById("lista-banners");
             bCont.innerHTML = "";
-
-            data.banners.forEach(b => {
-                const bCard = document.createElement("div");
-                bCard.className = "item-gestao";
-                bCard.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <span class="badge-alert" style="background:var(--primary); color:white;">BANNER LINHA: ${b.id_linha}</span>
-                        <button onclick="excluirBanner(${b.id_linha}, this)" style="background:none; border:none; color:var(--error); cursor:pointer;"><i class="fas fa-trash"></i></button>
-                    </div>
+            banners.forEach(b => {
+                const card = document.createElement("div");
+                card.className = "item-gestao";
+                card.innerHTML = `
+                    <div class="gestao-header"><b>LINHA: ${b.id_linha}</b> <button onclick="excluirBanner(${b.id_linha}, this)" style="background:none; border:none; color:var(--error);"><i class="fas fa-trash"></i></button></div>
                     <div class="grid-dynamic">
-                        <div><label>URL Imagem</label><input type="text" id="bi-${b.id_linha}" value="${b.imagem}"></div>
-                        <div><label>Título</label><input type="text" id="bt-${b.id_linha}" value="${b.titulo}"></div>
-                        <div><label>Texto Botão</label><input type="text" id="btxt-${b.id_linha}" value="${b.textoBtn}"></div>
-                        <div><label>Link Botão</label><input type="text" id="bl-${b.id_linha}" value="${b.linkBtn}"></div>
+                        <div><label>URL Imagem</label><input type="text" id="bi-${b.id_linha}" value="${b.imagem || ''}"></div>
+                        <div><label>Título</label><input type="text" id="bt-${b.id_linha}" value="${b.titulo || ''}"></div>
+                        <div><label>Texto Botão</label><input type="text" id="btxt-${b.id_linha}" value="${b.textoBtn || ''}"></div>
+                        <div><label>Link Botão</label><input type="text" id="bl-${b.id_linha}" value="${b.linkBtn || ''}"></div>
                         <div><label>Ativo</label>
                             <select id="ba-${b.id_linha}">
-                                <option value="sim" ${b.ativo === 'sim' ? 'selected' : ''}>Sim</option>
-                                <option value="não" ${b.ativo === 'não' ? 'selected' : ''}>Não</option>
+                                <option value="sim" ${b.ativo==='sim'?'selected':''}>Sim</option>
+                                <option value="não" ${b.ativo==='não'?'selected':''}>Não</option>
                             </select>
                         </div>
                     </div>
-                    <button class="btn-main" style="width:100%; margin-top:15px;" onclick="salvarBanner(${b.id_linha}, this)">SALVAR BANNER</button>
+                    <button class="btn-main" style="margin-top:15px;" onclick="salvarBanner(${b.id_linha}, this)">SALVAR BANNER</button>
                 `;
-                bCont.appendChild(bCard);
+                bCont.appendChild(card);
             });
-
-        } catch (e) { 
-            console.error("Erro ao carregar dados:", e); 
-        } finally { 
-            if (btn) setBtnLoading(btn, false, original); 
         }
-    }
-    // FORMULÁRIO DE BANNER
-    document.getElementById("productForm").onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById("btnPubProd");
-        const original = btn.innerHTML;
-        setBtnLoading(btn, true);
 
-        const payload = {
-            tipo: "produto",
-            nome: document.getElementById("nome").value,
-            ml: document.getElementById("ml").value,
-            preco: document.getElementById("preco").value,
-            categoria: document.getElementById("categoria").value,
-            cores: document.getElementById("cores").value,
-            tamanho: document.getElementById("tamanho").value,
-            imagem: document.getElementById("imagem").value,
-            disponivel: document.getElementById("disponivel").value,
-            destaque: document.getElementById("destaque").value,
-            estoque: document.getElementById("estoque").value
+        // --- FUNÇÕES DE SALVAMENTO ---
+        async function salvarProd(id, btn) {
+            const original = btn.innerHTML; setBtnLoading(btn, true);
+            const payload = {
+                tipo: "editar_produto", id,
+                nome: document.getElementById(`n-${id}`).value,
+                ml: document.getElementById(`m-${id}`).value,
+                preco: document.getElementById(`p-${id}`).value,
+                categoria: document.getElementById(`c-${id}`).value,
+                cores: document.getElementById(`co-${id}`).value,
+                tamanho: document.getElementById(`t-${id}`).value,
+                imagem: document.getElementById(`img-${id}`).value,
+                disponivel: document.getElementById(`d-${id}`).value,
+                estoque: document.getElementById(`e-${id}`).value,
+                destaque: document.getElementById(`dest-${id}`).value
+            };
+            try { await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) }); alert("Produto salvo!"); carregarDados(); } 
+            catch (e) { alert("Erro ao salvar."); } finally { setBtnLoading(btn, false, original); }
+        }
+
+        async function salvarBanner(linha, btn) {
+            const original = btn.innerHTML; setBtnLoading(btn, true);
+            const payload = { 
+                tipo: "editar_banner", 
+                linha, 
+                imagem: document.getElementById(`bi-${linha}`).value, 
+                titulo: document.getElementById(`bt-${linha}`).value, 
+                textoBtn: document.getElementById(`btxt-${linha}`).value, 
+                linkBtn: document.getElementById(`bl-${linha}`).value, 
+                ativo: document.getElementById(`ba-${linha}`).value 
+            };
+            try { await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) }); alert("Banner salvo!"); carregarDados(); } 
+            catch (e) { alert("Erro ao salvar."); } finally { setBtnLoading(btn, false, original); }
+        }
+
+        // --- SUBMIT FORMS ---
+        document.getElementById("productForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("btnPubProd");
+            const original = btn.innerHTML; setBtnLoading(btn, true);
+            const payload = {
+                tipo: "produto",
+                nome: document.getElementById("nome").value,
+                ml: document.getElementById("ml").value,
+                preco: document.getElementById("preco").value,
+                categoria: document.getElementById("categoria").value,
+                cores: document.getElementById("cores").value,
+                tamanho: document.getElementById("tamanho").value,
+                imagem: document.getElementById("imagem").value,
+                disponivel: document.getElementById("disponivel").value,
+                destaque: document.getElementById("destaque").value,
+                estoque: document.getElementById("estoque").value
+            };
+            try { await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) }); alert("Publicado!"); e.target.reset(); carregarDados(); } 
+            catch (e) { alert("Erro"); } finally { setBtnLoading(btn, false, original); }
         };
 
-        try {
-            // Removendo o 'no-cors' para ver se o Google retorna erro de permissão
-            const response = await fetch(SCRIPT_URL, { 
-                method: "POST", 
-                body: JSON.stringify(payload) 
-            });
-            
-            alert("Produto enviado! Verifique a planilha.");
-            e.target.reset();
-            setTimeout(carregarDados, 2000);
-        } catch (err) {
-            console.error(err);
-            alert("Ocorreu um erro no envio. Verifique o Console (F12).");
-        } finally {
-            setBtnLoading(btn, false, original);
-        }
-    };
-    async function salvarProd(id, btn) {
-    const original = btn.innerHTML; 
-    setBtnLoading(btn, true);
-    
-    const payload = {
-        tipo: "editar_produto",
-        id: id,
-        nome: document.getElementById(`n-${id}`).value,
-        ml: document.getElementById(`m-${id}`).value,
-        preco: document.getElementById(`p-${id}`).value,
-        categoria: document.getElementById(`c-${id}`).value,
-        cores: document.getElementById(`co-${id}`).value,
-        tamanho: document.getElementById(`t-${id}`).value,
-        imagem: document.getElementById(`img-${id}`).value,
-        disponivel: document.getElementById(`d-${id}`).value,
-        estoque: document.getElementById(`e-${id}`).value, // Envia o número que está no campo
-        destaque: document.getElementById(`dest-${id}`).value
-    };
-
-    try { 
-        // Importante: usei method POST. Certifique-se que seu Script trate o "editar_produto"
-        await fetch(SCRIPT_URL, { 
-            method: "POST", 
-            mode: "no-cors", 
-            body: JSON.stringify(payload) 
-        }); 
-        alert("Produto atualizado com sucesso!"); 
-        // Não precisa dar reload na página toda, apenas recarregar os dados
-        setTimeout(carregarDados, 1000);
-    } catch (e) {
-        alert("Erro ao salvar.");
-    } finally { 
-        setBtnLoading(btn, false, original); 
-    }
-}
-    async function salvarBanner(linha, btn) {
-        const original = btn.innerHTML; setBtnLoading(btn, true);
-        const payload = { 
-            tipo: "editar_banner", 
-            linha: linha, 
-            imagem: document.getElementById(`bi-${linha}`).value, 
-            titulo: document.getElementById(`bt-${linha}`).value, 
-            botaoTexto: document.getElementById(`btxt-${linha}`).value, 
-            botaoLink: document.getElementById(`bl-${linha}`).value, 
-            ativo: document.getElementById(`ba-${linha}`).value 
+        document.getElementById("bannerForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("btnPubBanner");
+            const original = btn.innerHTML; setBtnLoading(btn, true);
+            const payload = {
+                tipo: "banner",
+                imagem: document.getElementById("b-imagem").value,
+                titulo: document.getElementById("b-titulo").value,
+                textoBtn: document.getElementById("b-btn-texto").value,
+                linkBtn: document.getElementById("b-btn-link").value
+            };
+            try { await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) }); alert("Banner Adicionado!"); e.target.reset(); carregarDados(); } 
+            catch (e) { alert("Erro"); } finally { setBtnLoading(btn, false, original); }
         };
-        try { 
-            await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) }); 
-            alert("Banner atualizado!"); 
-        } finally { setBtnLoading(btn, false, original); }
-    }
 
-    async function excluirProd(id, btn) {
-        if (confirm("Excluir produto?")) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ tipo: "excluir_produto", id: id }) });
-            setTimeout(carregarDados, 1500);
-        }
-    }
-
-    async function excluirBanner(linha, btn) {
-        if (confirm("Excluir banner?")) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ tipo: "excluir_banner", linha: linha }) });
-            setTimeout(carregarDados, 1500);
-        }
-    }
-
-    document.getElementById('busca-admin').addEventListener('input', (e) => {
-        const t = e.target.value.toLowerCase();
-        document.querySelectorAll('#lista-gestao .item-gestao').forEach(card => {
-            card.style.display = card.innerText.toLowerCase().includes(t) ? "block" : "none";
-        });
-    });
-
-    function gerarPDF() {
-        const btn = document.getElementById("btnPdf");
-        const original = btn.innerHTML;
-        setBtnLoading(btn, true);
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF("l", "mm", "a4");
-
-        // Variáveis para o cálculo do rodapé
-        let somaTotalDinheiro = 0;
-        let somaTotalProdutos = 0;
-
-        doc.setFontSize(18);
-        doc.text("BALANÇO PATRIMONIAL DE ESTOQUE - DOMINC", 14, 15);
+        // --- OUTRAS FUNÇÕES ---
+        async function excluirProd(id, btn) { if (confirm("Excluir produto?")) { await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ tipo: "excluir_produto", id }) }); carregarDados(); } }
+        async function excluirBanner(linha, btn) { if (confirm("Excluir banner?")) { await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ tipo: "excluir_banner", linha }) }); carregarDados(); } }
         
-        doc.setFontSize(10);
-        doc.setTextColor(100);
-        doc.text(`Apenas itens com saldo disponível | Gerado em: ${new Date().toLocaleString()}`, 14, 22);
+        function gerarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF("l", "mm", "a4");
+            doc.text("Relatório de Estoque - DOMINC", 14, 15);
+            const rows = dadosLocais.produtos.map(p => [p.id, p.nome, p.preco, p.estoque, (p.estoque - (p.vendidos || 0))]);
+            doc.autoTable({ head: [['ID', 'Nome', 'Preço', 'Inicial', 'Saldo']], body: rows, startY: 25 });
+            doc.save("estoque-dominc.pdf");
+        }
 
-        const colunas = [
-            "ID", "Produto", "ML", "Preço Unit.", "Cat.", 
-            "Cores", "Tam.", "Est. Inicial", "Vendidos", "SALDO", "VALOR TOTAL"
-        ];
-
-        // Filtro e Mapeamento
-        const linhas = dadosLocais.produtos
-            .filter(p => {
-                const saldo = (parseInt(p.estoque) || 0) - (parseInt(p.vendidos) || 0);
-                return saldo > 0;
-            })
-            .map(p => {
-                const estoque = parseInt(p.estoque) || 0;
-                const vendidos = parseInt(p.vendidos) || 0;
-                const saldo = estoque - vendidos;
-                const precoUnit = parseFloat(p.preco) || 0;
-                const valorNoEstoque = saldo * precoUnit;
-
-                // Acumulando para o rodapé
-                somaTotalDinheiro += valorNoEstoque;
-                somaTotalProdutos += saldo;
-
-                return [
-                    p.id, 
-                    p.nome, 
-                    p.ml || "-", 
-                    `R$ ${precoUnit.toFixed(2)}`, 
-                    p.categoria, 
-                    p.cores || "-", 
-                    p.tamanho || "-", 
-                    estoque,
-                    vendidos,
-                    saldo,
-                    `R$ ${valorNoEstoque.toFixed(2)}`
-                ];
-            });
-
-        doc.autoTable({
-            head: [colunas],
-            body: linhas,
-            startY: 30,
-            theme: 'grid',
-            styles: { fontSize: 7, cellPadding: 2 },
-            headStyles: { fillColor: [142, 95, 177], textColor: [255, 255, 255] },
-            columnStyles: {
-                9: { fontStyle: 'bold' }, // Saldo
-                10: { fontStyle: 'bold', halign: 'right' } // Valor Total
-            },
-            // Adiciona a linha de totais no fim da tabela
-            foot: [[
-                "", "TOTAIS", "", "", "", "", "", "", "", 
-                somaTotalProdutos, 
-                `R$ ${somaTotalDinheiro.toFixed(2)}`
-            ]],
-            footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8 }
+        document.getElementById('busca-admin').addEventListener('input', (e) => {
+            const t = e.target.value.toLowerCase();
+            document.querySelectorAll('#lista-gestao .item-gestao').forEach(card => card.style.display = card.innerText.toLowerCase().includes(t) ? "block" : "none");
         });
-
-        // Informação visual extra abaixo da tabela
-        const finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(11);
-        doc.setTextColor(0);
-        doc.text(`Valor total investido em estoque: R$ ${somaTotalDinheiro.toFixed(2)}`, 14, finalY);
-
-        doc.save("balanco-financeiro-dominc.pdf");
-        setBtnLoading(btn, false, original);
-    }
-</script>
+    </script>
 </body>
-
-              </html>
+</html>
