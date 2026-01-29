@@ -235,33 +235,47 @@ function renderProducts(products) {
     productsContainer.innerHTML = "";
     
     products.forEach((p) => {
-        // 1. Pega os valores e limpa espaços/letras minúsculas
         const estoqueReal = parseInt(p["Saldo Estoque"]) || 0;
         const disponivelStatus = (p["Disponível"] || "").trim().toLowerCase();
-
-        // 2. A REGRA DE OURO: Se não tem estoque OU está marcado como "não", PARA TUDO e pula pro próximo
-        if (estoqueReal <= 0 || disponivelStatus === "não" || disponivelStatus === "nao") {
+        
+        // Agora só pulamos o produto se ele estiver marcado explicitamente como "não" disponível.
+        // Se o estoque for 0, vamos mostrar como esgotado.
+        if (disponivelStatus === "não" || disponivelStatus === "nao") {
             return; 
         }
 
-        // 3. Se passou pela regra acima, ele desenha o card
-        const isUltimas = estoqueReal <= 3;
+        const isEsgotado = estoqueReal <= 0;
+        const isUltimas = estoqueReal > 0 && estoqueReal <= 3;
+
         const card = document.createElement("div");
-        card.className = "bg-white rounded-3xl overflow-hidden border border-slate-100 flex flex-col h-full relative";
+        // Adicionamos uma opacidade se estiver esgotado para dar o efeito visual de "desativado"
+        card.className = `bg-white rounded-3xl overflow-hidden border border-slate-100 flex flex-col h-full relative ${isEsgotado ? 'opacity-60' : ''}`;
         
         card.innerHTML = `
             <div class="relative aspect-[4/5] bg-slate-50">
-                <img src="${driveImg(p["Imagem"])}" class="w-full h-full object-cover">
-                ${isUltimas ? '<div class="absolute bottom-2 right-2 bg-orange-500 text-white text-[8px] font-bold px-2 py-1 rounded-lg animate-pulse">ÚLTIMAS UNIDADES</div>' : ''}
+                <img src="${driveImg(p["Imagem"])}" class="w-full h-full object-cover ${isEsgotado ? 'grayscale' : ''}">
+                
+                ${isEsgotado 
+                    ? '<div class="absolute inset-0 flex items-center justify-center bg-black/20"><span class="bg-red-600 text-white text-xs font-black px-4 py-2 rounded-full shadow-xl">ESGOTADO</span></div>' 
+                    : isUltimas ? '<div class="absolute bottom-2 right-2 bg-orange-500 text-white text-[8px] font-bold px-2 py-1 rounded-lg animate-pulse">ÚLTIMAS UNIDADES</div>' : ''
+                }
             </div>
+
             <div class="p-4 flex flex-col flex-1">
                 <span class="text-[10px] font-bold text-accent uppercase">${p["Categoria"]}</span>
-                <h3 class="font-bold text-sm text-textDark mb-2 h-10 overflow-hidden">${p["Nome do Produto"]}</h3>
+                <h3 class="font-bold text-sm text-textDark mb-1 h-10 overflow-hidden">${p["Nome do Produto"]}</h3>
+                
+                <p class="text-[10px] font-bold ${isEsgotado ? "text-red-500" : isUltimas ? "text-orange-500" : "text-green-600"} mb-2">
+                    ${isEsgotado ? "Indisponível no momento" : isUltimas ? `Resta(m) apenas ${estoqueReal}!` : `Estoque disponível: ${estoqueReal}`}
+                </p>
+                
                 <div class="mt-auto">
                     <p class="text-lg font-black text-primary mb-3">R$ ${p["Preço"].toFixed(2).replace(".", ",")}</p>
-                    <button onclick="openSizeSelector('${p["ID"]}','${p["Nome do Produto"]}',${p["Preço"]},'${p["Imagem"]}')" 
-                        class="w-full py-3 rounded-xl font-bold text-[10px] uppercase bg-primary text-white hover:bg-accent transition">
-                        Escolher Opções
+                    
+                    <button 
+                        ${isEsgotado ? 'disabled' : `onclick="openSizeSelector('${p["ID"]}','${p["Nome do Produto"]}',${p["Preço"]},'${p["Imagem"]}')"`}
+                        class="w-full py-3 rounded-xl font-bold text-[10px] uppercase transition ${isEsgotado ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-primary text-white hover:bg-accent'}">
+                        ${isEsgotado ? 'Indisponível' : 'Escolher Opções'}
                     </button>
                 </div>
             </div>`;
@@ -904,3 +918,4 @@ fetch(ESTOQUE_API_URL, {
     if (closeMobileMenu) closeMobileMenu.onclick = close;
     if (mobileOverlay) mobileOverlay.onclick = close;
   }
+
