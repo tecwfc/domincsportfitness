@@ -638,7 +638,7 @@ fetch(ESTOQUE_API_URL, {
     }),
 });
           // 5. Abre o WhatsApp com a API oficial (mais estável)
-          const whatsappUrl = `https://api.whatsapp.com/send?phone=5588999049636&text=${msgEncoded}`;
+          const whatsappUrl = `https://api.whatsapp.com/send?phone=5588999565560&text=${msgEncoded}`;
           window.open(whatsappUrl, "_blank");
 
           // 6. Limpa o carrinho e fecha o modal
@@ -810,7 +810,7 @@ fetch(ESTOQUE_API_URL, {
     const saudacaoSuporte = encodeURIComponent(
       "Olá! Vi o site da DOMINC SPORT FITNESS e gostaria de tirar uma dúvida sobre um produto.",
     );
-    botaoFlutuante.href = `https://wa.me/5588999049636?text=${saudacaoSuporte}`;
+    botaoFlutuante.href = `https://wa.me/5588999565560?text=${saudacaoSuporte}`;
   }
 
   // Localize onde você trata o clique nas categorias e use este padrão:
@@ -918,4 +918,5 @@ fetch(ESTOQUE_API_URL, {
     if (closeMobileMenu) closeMobileMenu.onclick = close;
     if (mobileOverlay) mobileOverlay.onclick = close;
   }
+
 
